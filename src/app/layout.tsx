@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     description:
       'AI-powered lead capture & booking automation for home service contractors.',
   },
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
