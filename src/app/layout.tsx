@@ -21,7 +21,7 @@ export const metadata: Metadata = {
       'AI-powered lead capture & booking automation for home service contractors.',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.svg',
   },
 }
 
