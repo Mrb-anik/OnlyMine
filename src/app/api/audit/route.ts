@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { adminClient } from '@/lib/supabase/admin'
-import { resend, FROM_EMAIL } from '@/lib/resend'
+import { resend } from '@/lib/resend'
+import { generateCalLink } from '@/lib/cal'
+
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'hello@leadmatrixllc.us'
 
 export async function POST(req: Request) {
   try {
@@ -11,8 +14,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 })
     }
 
-    // Save to Supabase audit_leads table
-    const { error: dbError } = await adminClient
+    const startTime = Date.now()
+
+    // 1. Save lead to Supabase
+    const { data: leadData, error: dbError } = await adminClient
       .from('audit_leads')
       .insert({
         name,
@@ -22,62 +27,85 @@ export async function POST(req: Request) {
         revenue_range: revenue || null,
         status: 'pending',
       })
+      .select('id')
+      .single()
 
     if (dbError) {
-      console.error('Supabase insert error:', dbError)
-      // Don't fail — still send email even if DB insert fails
+      console.error('Database error:', dbError)
+      // We continue even if DB fails to log, to prioritize the customer experience
     }
 
-    // Send confirmation email to prospect
-    await resend.emails.send({
+    // 2. Generate the Lead Matrix Audit Cal.com link
+    // Replace 'leadmatrix' and 'audit-call' with your actual Cal.com details
+    const calLink = generateCalLink('leadmatrix', 'audit-call')
+
+    // 3. Send AUTO-RESPONSE EMAIL (Speed to Lead)
+    const { data: emailData, error: emailError } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: 'Your Free Lead Loss Audit Request – Lead Matrix',
+      subject: `${name}, let's talk about ${business || 'your business'}`,
       html: `
-        <div style="font-family: 'DM Sans', sans-serif; background: #0A0E27; color: #fff; padding: 40px; border-radius: 16px; max-width: 600px; margin: 0 auto;">
-          <div style="font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 900; color: #FF6B35; margin-bottom: 8px;">
-            Lead<span style="color: #fff;">Matrix</span>
-          </div>
-          <h1 style="font-size: 28px; font-weight: 800; margin: 24px 0 12px;">
-            We got your audit request, ${name}! 🎉
-          </h1>
-          <p style="color: rgba(255,255,255,0.75); font-size: 16px; line-height: 1.7; margin-bottom: 16px;">
-            Thank you for reaching out. We're preparing your personalized <strong>Lead Loss Audit</strong> for <strong>${business}</strong>.
+        <div style="font-family: sans-serif; background: #0A0E27; color: #fff; padding: 40px; border-radius: 16px; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #FF6B35; font-size: 24px; margin-bottom: 16px;">Thanks for your interest, ${name}! 👋</h2>
+          <p style="font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.8);">
+            I've received your request for a <strong>Free Lead Loss Audit</strong> for ${business || 'your company'}. 
+            Most contracting businesses we audit are losing between $30k - $200k a year simply by responding too slowly.
           </p>
-          <p style="color: rgba(255,255,255,0.75); font-size: 16px; line-height: 1.7; margin-bottom: 24px;">
-            You'll hear back from us within <strong>24 hours</strong> with a detailed breakdown of where you may be losing revenue — and exactly how to capture it.
-          </p>
-          <div style="background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.4); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-            <p style="font-weight: 700; margin: 0 0 8px; color: #FF6B35;">While you wait:</p>
-            <ul style="color: rgba(255,255,255,0.75); margin: 0; padding-left: 20px; line-height: 1.9;">
-              <li>78% of customers hire the first contractor to respond</li>
-              <li>40–60% of leads come after business hours</li>
-              <li>Average client books 35% more jobs in 90 days with Lead Matrix</li>
-            </ul>
+          <div style="background: rgba(255,107,53,0.1); border: 2px solid #FF6B35; padding: 24px; border-radius: 12px; margin: 32px 0; text-align: center;">
+             <p style="font-weight: bold; margin-bottom: 16px;">📅 Choose a time for your 15-min audit call:</p>
+             <a href="${calLink}" style="display: inline-block; background: #FF6B35; color: #000; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 800; font-size: 16px;">
+               Book My Free Audit →
+             </a>
           </div>
-          <p style="color: rgba(255,255,255,0.5); font-size: 14px;">
-            Questions? Reply to this email or reach us at hello@leadmatrixllc.us
+          <p style="font-size: 14px; color: rgba(255,255,255,0.5);">
+            Talk soon,<br>The Lead Matrix Team
           </p>
         </div>
       `,
-    }).catch(console.error)
+    })
 
-    // Notify owner (you) about new audit request
-    await resend.emails.send({
+    const responseTime = Math.round((Date.now() - startTime) / 1000)
+
+    // 4. Log the automation event
+    if (leadData) {
+      await adminClient.from('automation_logs').insert({
+        lead_id: leadData.id,
+        action_type: 'initial_auto_response',
+        details: {
+          email_id: emailData?.id,
+          response_time_seconds: responseTime,
+          cal_link: calLink,
+        },
+        success: !emailError,
+        error_message: emailError?.message || null,
+      })
+      
+      // Initialize the sequence trackers
+      await adminClient.from('email_sequences').insert({
+        lead_id: leadData.id,
+        sequence_type: 'initial_response',
+        email_subject: `${name}, let's talk about ${business || 'your business'}`,
+        email_body: 'Initial speed-to-lead auto-response sent.',
+      })
+    }
+
+    // 5. Notify the Owner (Non-blocking)
+    resend.emails.send({
       from: FROM_EMAIL,
       to: 'hello@leadmatrixllc.us',
-      subject: `🔔 New Audit Lead: ${business || name}`,
+      subject: `🔔 NEW AUDIT LEAD: ${business || name} (${responseTime}s response)`,
       html: `
-        <h2>New Audit Request</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Business:</strong> ${business || 'N/A'}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-        <p><strong>Revenue:</strong> ${revenue || 'N/A'}</p>
+        <h3>New Lead Details:</h3>
+        <p><b>Name:</b> ${name}<br><b>Email:</b> ${email}<br><b>Phone:</b> ${phone || 'N/A'}<br><b>Business:</b> ${business || 'N/A'}<br><b>Revenue:</b> ${revenue || 'N/A'}</p>
+        <p><b>Auto-response sent in ${responseTime} seconds.</b></p>
       `,
-    }).catch(console.error)
+    }).catch(e => console.error('Owner notification failed', e))
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ 
+      success: true, 
+      responseTime,
+      auditId: leadData?.id
+    })
   } catch (err) {
     console.error('Audit API error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

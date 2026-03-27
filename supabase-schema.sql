@@ -79,15 +79,31 @@ CREATE TABLE audit_leads (
 );
 
 -- ============================================================
--- 5. AUTOMATION LOGS TABLE
+-- 5. EMAIL SEQUENCES TABLE (for tracking multi-day follow-ups)
+-- ============================================================
+CREATE TABLE email_sequences (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id         UUID REFERENCES leads(id) ON DELETE CASCADE,
+  sequence_type   TEXT NOT NULL, -- 'initial_response', 'follow_up_1', 'follow_up_2', etc.
+  sent_at         TIMESTAMPTZ DEFAULT NOW(),
+  email_subject   TEXT,
+  email_body      TEXT,
+  opened          BOOLEAN DEFAULT false,
+  clicked         BOOLEAN DEFAULT false
+);
+
+-- ============================================================
+-- 6. AUTOMATION LOGS TABLE
 -- Every n8n action logged here for debugging/reporting
 -- ============================================================
 CREATE TABLE automation_logs (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   client_id       UUID REFERENCES clients(id) ON DELETE CASCADE,
   lead_id         UUID REFERENCES leads(id) ON DELETE SET NULL,
-  action_type     TEXT NOT NULL, -- 'lead_captured', 'auto_response_sent', 'appointment_booked', etc.
+  action_type     TEXT NOT NULL, -- 'email_sent', 'booking_created', 'follow_up_scheduled'
   details         JSONB DEFAULT '{}',
+  success         BOOLEAN DEFAULT true,
+  error_message   TEXT,
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -100,7 +116,7 @@ CREATE INDEX idx_leads_status ON leads(status);
 CREATE INDEX idx_appointments_client_id ON appointments(client_id);
 CREATE INDEX idx_appointments_scheduled_date ON appointments(scheduled_date);
 CREATE INDEX idx_automation_logs_client_id ON automation_logs(client_id);
-CREATE INDEX idx_automation_logs_created_at ON automation_logs(created_at DESC);
+CREATE INDEX idx_email_sequences_lead_id ON email_sequences(lead_id);
 
 -- ============================================================
 -- UPDATED_AT TRIGGER for leads
@@ -127,6 +143,7 @@ ALTER TABLE leads          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE appointments   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_leads    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE automation_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE email_sequences ENABLE ROW LEVEL SECURITY;
 
 -- Clients: users can only see their own client row
 CREATE POLICY "clients_own" ON clients
@@ -140,7 +157,7 @@ CREATE POLICY "leads_own" ON leads
     )
   );
 
--- Appointments: clients see only their own appointments
+-- Appointments/Logs/Sequences: clients see only their own data
 CREATE POLICY "appointments_own" ON appointments
   FOR SELECT USING (
     client_id IN (
@@ -148,7 +165,6 @@ CREATE POLICY "appointments_own" ON appointments
     )
   );
 
--- Automation logs: clients see their own logs
 CREATE POLICY "logs_own" ON automation_logs
   FOR SELECT USING (
     client_id IN (
@@ -156,11 +172,15 @@ CREATE POLICY "logs_own" ON automation_logs
     )
   );
 
--- audit_leads: no public access (service role only via adminClient)
--- (No SELECT policy = only service_role can read/write)
+CREATE POLICY "sequences_own" ON email_sequences
+  FOR SELECT USING (
+    lead_id IN (
+      SELECT id FROM leads WHERE client_id IN (
+        SELECT id FROM clients WHERE user_id = auth.uid()
+      )
+    )
+  );
 
--- ============================================================
 -- REALTIME (enable for live dashboard updates)
--- ============================================================
 -- Run in Supabase Dashboard → Replication → Enable these tables:
--- leads, appointments
+-- leads, appointments, automation_logs
