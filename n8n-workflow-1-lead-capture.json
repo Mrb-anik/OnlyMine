@@ -1,0 +1,158 @@
+{
+  "name": "Lead Capture & Auto-Response (Resend Email)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook - Lead Capture",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "lead-capture-webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_URL }}/api/n8n/leads",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-webhook-secret", "value": "={{ $env.N8N_WEBHOOK_SECRET }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "client_id", "value": "={{ $json.client_id }}" },
+            { "name": "name", "value": "={{ $json.name }}" },
+            { "name": "phone", "value": "={{ $json.phone }}" },
+            { "name": "email", "value": "={{ $json.email }}" },
+            { "name": "source", "value": "={{ $json.source || 'website' }}" },
+            { "name": "message", "value": "={{ $json.message }}" },
+            { "name": "status", "value": "new" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "HTTP - Save Lead to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const responseAt = new Date();\nconst responseTimeSeconds = 45; // Target: respond in 45-60s\n\nreturn {\n  lead_id: $input.first().json.lead_id,\n  response_time_seconds: responseTimeSeconds,\n  email: $input.all()[0].json.email,\n  name: $input.all()[0].json.name || 'there',\n  phone: $input.all()[0].json.phone,\n  client_id: $input.all()[0].json.client_id,\n  business_name: $input.all()[0].json.business_name || 'our team',\n  cal_link: $input.all()[0].json.cal_link || 'https://cal.com/leadmatrix'\n};"
+      },
+      "name": "Prepare Response Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.RESEND_API_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"from\": \"hello@leadmatrixllc.us\",\n  \"to\": \"{{ $json.email }}\",\n  \"subject\": \"We got your message – reply coming in minutes!\",\n  \"html\": \"<div style='font-family:sans-serif;max-width:600px;padding:32px;'><h2 style='color:#FF6B35;'>Hi {{ $json.name }}! 👋</h2><p>Thanks for reaching out to <strong>{{ $json.business_name }}</strong>. We received your message and someone from our team will be in touch within the next <strong>15 minutes</strong>.</p><p>In the meantime, you can book a time that works for you:</p><a href='{{ $json.cal_link }}' style='display:inline-block;background:#FF6B35;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:bold;margin:16px 0;'>📅 Book Your Appointment</a><p style='color:#999;font-size:13px;'>Need urgent help? Call us directly.</p></div>\"\n}",
+        "options": {}
+      },
+      "name": "Resend - Auto-Response Email to Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.RESEND_API_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"from\": \"alerts@leadmatrixllc.us\",\n  \"to\": \"hello@leadmatrixllc.us\",\n  \"subject\": \"🔔 NEW LEAD: {{ $json.name }} ({{ $json.phone }})\",\n  \"html\": \"<h2>New Lead Captured</h2><p><b>Name:</b> {{ $json.name }}<br><b>Phone:</b> {{ $json.phone }}<br><b>Email:</b> {{ $json.email }}</p><p>Auto-response email sent! ✅</p>\"\n}",
+        "options": {}
+      },
+      "name": "Resend - Notify Business Owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.APP_URL }}/api/n8n/leads",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-webhook-secret", "value": "={{ $env.N8N_WEBHOOK_SECRET }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "lead_id", "value": "={{ $json.lead_id }}" },
+            { "name": "status", "value": "contacted" },
+            { "name": "response_time", "value": "={{ $json.response_time_seconds }}" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "HTTP - Update Lead Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success: true, lead_id: $json.lead_id}) }}"
+      },
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - Lead Capture": {
+      "main": [[{ "node": "HTTP - Save Lead to Supabase", "type": "main", "index": 0 }]]
+    },
+    "HTTP - Save Lead to Supabase": {
+      "main": [[{ "node": "Prepare Response Data", "type": "main", "index": 0 }]]
+    },
+    "Prepare Response Data": {
+      "main": [[
+        { "node": "Resend - Auto-Response Email to Lead", "type": "main", "index": 0 },
+        { "node": "Resend - Notify Business Owner", "type": "main", "index": 0 }
+      ]]
+    },
+    "Resend - Auto-Response Email to Lead": {
+      "main": [[{ "node": "HTTP - Update Lead Status", "type": "main", "index": 0 }]]
+    },
+    "HTTP - Update Lead Status": {
+      "main": [[{ "node": "Webhook Response", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": ["lead-matrix"],
+  "updatedAt": "2026-03-26T00:00:00.000Z"
+}

@@ -1,0 +1,277 @@
+{
+  "name": "Missed Call Text-Back",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "missed-call",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook - Twilio Call Status",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "missed-call-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.CallStatus }}",
+              "operation": "equals",
+              "value2": "no-answer"
+            }
+          ]
+        }
+      },
+      "name": "Check if Missed Call",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "leads",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_id": "={{ $json.client_id }}",
+            "phone": "={{ $json.From }}",
+            "source": "phone_call",
+            "status": "new",
+            "message": "Missed call"
+          }
+        },
+        "options": {}
+      },
+      "name": "Supabase - Create Lead from Missed Call",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [650, 250],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $json.To }}",
+        "toNumber": "={{ $json.From }}",
+        "message": "=Hi! We just missed your call. What can we help you with today? Reply to this text or call us back anytime."
+      },
+      "name": "Twilio - Send Text",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 250],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes"
+      },
+      "name": "Wait 30 Minutes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1050, 250]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "table": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "value": "={{ $json.From }}"
+            },
+            {
+              "keyName": "status",
+              "value": "new"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Check Lead Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1250, 250],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.length }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "name": "Still No Response?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 250]
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $input.first().json.To }}",
+        "toNumber": "={{ $input.first().json.From }}",
+        "message": "=Hi again! Just wanted to make sure you got our message. We're here and ready to help. What service are you looking for? Here's our booking link: {{ $json.booking_url }}"
+      },
+      "name": "Twilio - Follow-up Text",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1650, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $json.To }}",
+        "toNumber": "={{ $json.owner_phone }}",
+        "message": "=⚠️ MISSED CALL\n\nFrom: {{ $json.From }}\nTime: {{ $now.toLocaleString() }}\n\nAuto-text sent. Customer hasn't responded yet.\n\nCall them back: {{ $json.From }}"
+      },
+      "name": "Twilio - Alert Owner",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 400],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "OK"
+      },
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Twilio Call Status": {
+      "main": [
+        [
+          {
+            "node": "Check if Missed Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Missed Call": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Create Lead from Missed Call",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Create Lead from Missed Call": {
+      "main": [
+        [
+          {
+            "node": "Twilio - Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio - Send Text": {
+      "main": [
+        [
+          {
+            "node": "Wait 30 Minutes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twilio - Alert Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Check Lead Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Check Lead Status": {
+      "main": [
+        [
+          {
+            "node": "Still No Response?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Still No Response?": {
+      "main": [
+        [
+          {
+            "node": "Twilio - Follow-up Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-25T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -1,0 +1,284 @@
+{
+  "name": "Daily Performance Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "cronExpression": "0 17 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule - Daily at 5 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "table": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "value": "active"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Get Active Clients",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Loop Over Clients",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "table": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "client_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "keyName": "created_at",
+              "operator": "gte",
+              "value": "={{ new Date(new Date().setHours(0,0,0,0)).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Get Today's Leads",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "table": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "client_id",
+              "value": "={{ $input.first().json.id }}"
+            },
+            {
+              "keyName": "created_at",
+              "operator": "gte",
+              "value": "={{ new Date(new Date().setHours(0,0,0,0)).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Get Today's Appointments",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Calculate daily statistics\nconst client = $input.first().json;\nconst leads = $input.item(1).json;\nconst appointments = $input.item(2).json;\n\n// Calculate metrics\nconst totalLeads = Array.isArray(leads) ? leads.length : 0;\nconst bookedAppointments = Array.isArray(appointments) ? appointments.length : 0;\n\n// Calculate average response time\nlet avgResponseTime = 0;\nif (Array.isArray(leads) && leads.length > 0) {\n  const totalResponseTime = leads.reduce((sum, lead) => {\n    return sum + (lead.response_time || 0);\n  }, 0);\n  avgResponseTime = Math.round(totalResponseTime / leads.length);\n}\n\n// Calculate conversion rate\nconst conversionRate = totalLeads > 0 \n  ? Math.round((bookedAppointments / totalLeads) * 100) \n  : 0;\n\n// Lead sources breakdown\nconst sourceBreakdown = {};\nif (Array.isArray(leads)) {\n  leads.forEach(lead => {\n    const source = lead.source || 'unknown';\n    sourceBreakdown[source] = (sourceBreakdown[source] || 0) + 1;\n  });\n}\n\nreturn {\n  client_id: client.id,\n  company_name: client.company_name,\n  contact_email: client.email,\n  contact_phone: client.phone,\n  totalLeads,\n  bookedAppointments,\n  avgResponseTime,\n  conversionRate,\n  sourceBreakdown,\n  date: new Date().toLocaleDateString()\n};"
+      },
+      "name": "Calculate Daily Stats",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "subject": "=📊 Daily Performance Report - {{ $json.date }}",
+        "fromEmail": "reports@leadcapturepro.com",
+        "toEmail": "={{ $json.contact_email }}",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: 'Arial', sans-serif; background: #f4f4f4; padding: 20px; }\n    .container { background: white; max-width: 600px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }\n    .header { background: linear-gradient(135deg, #FF6B35 0%, #E64D1F 100%); color: white; padding: 30px; text-align: center; }\n    .header h1 { margin: 0; font-size: 24px; }\n    .content { padding: 30px; }\n    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }\n    .stat-card { background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; }\n    .stat-label { font-size: 14px; color: #666; margin-bottom: 8px; }\n    .stat-value { font-size: 32px; font-weight: bold; color: #FF6B35; }\n    .section { margin: 25px 0; }\n    .section-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333; }\n    .source-item { display: flex; justify-content: space-between; padding: 12px; background: #f9f9f9; margin: 8px 0; border-radius: 6px; }\n    .footer { background: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #666; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>📊 Daily Performance Report</h1>\n      <p style=\"margin: 10px 0 0 0; opacity: 0.9;\">{{ $json.company_name }} - {{ $json.date }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <h2 style=\"color: #333;\">Today's Summary</h2>\n      \n      <div class=\"stat-grid\">\n        <div class=\"stat-card\">\n          <div class=\"stat-label\">Total Leads</div>\n          <div class=\"stat-value\">{{ $json.totalLeads }}</div>\n        </div>\n        <div class=\"stat-card\">\n          <div class=\"stat-label\">Booked</div>\n          <div class=\"stat-value\">{{ $json.bookedAppointments }}</div>\n        </div>\n        <div class=\"stat-card\">\n          <div class=\"stat-label\">Response Time</div>\n          <div class=\"stat-value\">{{ $json.avgResponseTime }}s</div>\n        </div>\n        <div class=\"stat-card\">\n          <div class=\"stat-label\">Conversion Rate</div>\n          <div class=\"stat-value\">{{ $json.conversionRate }}%</div>\n        </div>\n      </div>\n      \n      <div class=\"section\">\n        <div class=\"section-title\">Lead Sources</div>\n        {{#each $json.sourceBreakdown}}\n        <div class=\"source-item\">\n          <span>{{ @key }}</span>\n          <strong>{{ this }}</strong>\n        </div>\n        {{/each}}\n      </div>\n      \n      <div style=\"background: #E8F5E9; padding: 20px; border-radius: 8px; margin-top: 25px;\">\n        <strong style=\"color: #2E7D32;\">💡 Insight:</strong>\n        <p style=\"margin: 10px 0 0 0; color: #333;\">Your {{ $json.avgResponseTime }}s average response time is {{ $json.avgResponseTime < 60 ? 'excellent' : 'good' }}! Keep it up.</p>\n      </div>\n    </div>\n    \n    <div class=\"footer\">\n      <p>View full dashboard at your portal | Questions? Reply to this email</p>\n      <p>&copy; 2026 LeadCapture Pro. All rights reserved.</p>\n    </div>\n  </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "name": "Gmail - Send Report Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1450, 250],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $json.twilio_number }}",
+        "toNumber": "={{ $json.contact_phone }}",
+        "message": "=📊 Today's Stats:\n• {{ $json.totalLeads }} leads\n• {{ $json.bookedAppointments }} appointments\n• {{ $json.avgResponseTime }}s avg response\n• {{ $json.conversionRate }}% conversion\n\nFull report sent to email. Great day! 🚀"
+      },
+      "name": "Twilio - Send Summary SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1450, 350],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "automation_logs",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_id": "={{ $json.client_id }}",
+            "action_type": "daily_report_sent",
+            "details": "={{ JSON.stringify($json) }}"
+          }
+        }
+      },
+      "name": "Supabase - Log Report",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1650, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule - Daily at 5 PM": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Active Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Active Clients": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Clients": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Today's Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Today's Leads": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Today's Appointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Today's Appointments": {
+      "main": [
+        [
+          {
+            "node": "Calculate Daily Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Daily Stats": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Send Report Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twilio - Send Summary SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Send Report Email": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio - Send Summary SMS": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-25T00:00:00.000Z",
+  "versionId": "1"
+}

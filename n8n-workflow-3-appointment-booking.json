@@ -1,0 +1,279 @@
+{
+  "name": "Appointment Booking & Confirmation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "appointment-booked",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook - Cal.com Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "appointment-webhook"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "appointments",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_id": "={{ $json.client_id }}",
+            "customer_name": "={{ $json.payload.name }}",
+            "phone": "={{ $json.payload.phone }}",
+            "email": "={{ $json.payload.email }}",
+            "service_type": "={{ $json.payload.eventType.title }}",
+            "scheduled_date": "={{ $json.payload.startTime }}",
+            "status": "scheduled"
+          }
+        },
+        "options": {}
+      },
+      "name": "Supabase - Save Appointment",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "value": "={{ $json.phone }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booked": true,
+            "status": "booked"
+          }
+        }
+      },
+      "name": "Supabase - Update Lead Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $json.twilio_number }}",
+        "toNumber": "={{ $input.first().json.payload.phone }}",
+        "message": "=✅ APPOINTMENT CONFIRMED\n\nService: {{ $input.first().json.payload.eventType.title }}\nDate: {{ new Date($input.first().json.payload.startTime).toLocaleDateString() }}\nTime: {{ new Date($input.first().json.payload.startTime).toLocaleTimeString() }}\n\nWe'll send a reminder 24 hours before. Questions? Reply here or call {{ $json.business_phone }}"
+      },
+      "name": "Twilio - Send Confirmation to Customer",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 250],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $json.twilio_number }}",
+        "toNumber": "={{ $json.owner_phone }}",
+        "message": "=📅 NEW APPOINTMENT BOOKED\n\nCustomer: {{ $input.first().json.payload.name }}\nPhone: {{ $input.first().json.payload.phone }}\nService: {{ $input.first().json.payload.eventType.title }}\nDate/Time: {{ new Date($input.first().json.payload.startTime).toLocaleString() }}\n\nView dashboard: {{ $json.dashboard_url }}"
+      },
+      "name": "Twilio - Notify Business Owner",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 350],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "name": "Wait Until 24hrs Before",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "table": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "value": "scheduled"
+            }
+          ]
+        }
+      },
+      "name": "Supabase - Get Appointments Tomorrow",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Filter appointments that are 24 hours away\nconst now = new Date();\nconst tomorrow = new Date(now.getTime() + (24 * 60 * 60 * 1000));\nconst windowStart = new Date(tomorrow.getTime() - (2 * 60 * 60 * 1000)); // 22 hours\nconst windowEnd = new Date(tomorrow.getTime() + (2 * 60 * 60 * 1000)); // 26 hours\n\nconst appointmentsToRemind = $input.all().filter(item => {\n  const aptDate = new Date(item.json.scheduled_date);\n  return aptDate >= windowStart && aptDate <= windowEnd;\n});\n\nreturn appointmentsToRemind.map(apt => apt.json);"
+      },
+      "name": "Filter 24hr Appointments",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $json.twilio_number }}",
+        "toNumber": "={{ $json.phone }}",
+        "message": "=⏰ REMINDER: You have an appointment tomorrow!\n\nService: {{ $json.service_type }}\nDate: {{ new Date($json.scheduled_date).toLocaleDateString() }}\nTime: {{ new Date($json.scheduled_date).toLocaleTimeString() }}\n\nSee you then! Need to reschedule? Reply to this message."
+      },
+      "name": "Twilio - Send 24hr Reminder",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1650, 300],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({success: true, message: 'Appointment confirmed'}) }}"
+      },
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 250]
+    }
+  ],
+  "connections": {
+    "Webhook - Cal.com Booking": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Save Appointment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Save Appointment": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Update Lead Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Update Lead Status": {
+      "main": [
+        [
+          {
+            "node": "Twilio - Send Confirmation to Customer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twilio - Notify Business Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio - Send Confirmation to Customer": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Until 24hrs Before": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Appointments Tomorrow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Appointments Tomorrow": {
+      "main": [
+        [
+          {
+            "node": "Filter 24hr Appointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter 24hr Appointments": {
+      "main": [
+        [
+          {
+            "node": "Twilio - Send 24hr Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-25T00:00:00.000Z",
+  "versionId": "1"
+}
