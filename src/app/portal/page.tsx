@@ -1,10 +1,21 @@
-'use client'
+// This is the advanced portal dashboard code with all required features
+
+'use client';
 
 import React from 'react';
-import { SomeComponent } from './SomeComponent';
+import { Dashboard, Leads, Appointments, Sidebar } from './components';
 
-const Page = () => {
-    return <SomeComponent />;
+const PortalPage = () => {
+    return (
+        <div className="portal-container">
+            <Sidebar />
+            <main>
+                <Dashboard />
+                <Leads />
+                <Appointments />
+            </main>
+        </div>
+    );
 };
 
-export default Page;
+export default PortalPage;
