@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Zap, BarChart2, Users, Calendar, LogOut, RefreshCw,
-  TrendingUp, Clock, ArrowUp, Menu,
-  Phone, Mail, AlertCircle, Settings
+  Phone, Mail, AlertCircle, Settings, UploadCloud, TrendingUp, Clock, ArrowUp, Menu
 } from 'lucide-react'
 import { AdminTab } from './AdminTab'
 import { createClient } from '@/lib/supabase/client'
@@ -223,29 +222,70 @@ function DashboardTab({ stats, leads }: { stats: DashboardStats; leads: Lead[] }
 }
 
 // ─── Leads Tab ────────────────────────────────────────────────────────────────
-function LeadsTab({ leads }: { leads: Lead[] }) {
+function LeadsTab({ leads, onRefresh }: { leads: Lead[], onRefresh: () => void }) {
   const [filter, setFilter] = useState<string>('all')
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadMessage, setUploadMessage] = useState('')
 
   const filtered = filter === 'all' ? leads : leads.filter(l => l.status === filter)
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!uploadFile) return
+    setUploading(true)
+    setUploadMessage('')
+    
+    const formData = new FormData()
+    formData.append('file', uploadFile)
+
+    try {
+      const res = await fetch('/api/leads/import-csv', { method: 'POST', body: formData })
+      const json = await res.json()
+      if (res.ok) {
+         setUploadMessage(json.message)
+         onRefresh()
+      }
+      else setUploadMessage(json.error || 'Upload failed')
+    } catch (err: any) {
+      setUploadMessage(err.message)
+    } finally {
+      setUploading(false)
+      setUploadFile(null)
+    }
+  }
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h2 className="text-2xl font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>All Leads</h2>
-        <div className="flex gap-2 flex-wrap">
-          {['all', 'new', 'contacted', 'booked', 'completed', 'lost'].map(s => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                filter === s ? 'bg-[#FF6B35] text-white' : 'text-white/50 border border-white/15 hover:text-white'
-              }`}
-            >
-              {s}
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+           {/* Upload Form */}
+           <form onSubmit={handleUpload} className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+             <input type="file" accept=".csv" className="text-xs w-48 text-white/60 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#FF6B35] file:text-white hover:file:bg-[#e05b2c] cursor-pointer" onChange={e => setUploadFile(e.target.files?.[0] || null)} required />
+             <button type="submit" disabled={uploading || !uploadFile} className="bg-[#FF6B35] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#e05b2c] transition-colors flex items-center gap-1 disabled:opacity-50">
+               <UploadCloud className="w-3.5 h-3.5" />
+               {uploading ? '...' : 'Import'}
+             </button>
+           </form>
+
+           <div className="flex gap-2 flex-wrap">
+             {['all', 'new', 'contacted', 'booked', 'completed', 'lost'].map(s => (
+               <button
+                 key={s}
+                 onClick={() => setFilter(s)}
+                 className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
+                   filter === s ? 'bg-[#FF6B35] text-white' : 'text-white/50 border border-white/15 hover:text-white'
+                 }`}
+               >
+                 {s}
+               </button>
+             ))}
+           </div>
         </div>
       </div>
+
+      {uploadMessage && <div className="mb-6 p-4 bg-white/5 border border-white/10 text-white rounded-xl text-sm font-semibold">{uploadMessage}</div>}
 
       <div className="glass-card rounded-2xl overflow-hidden">
         {filtered.length === 0 ? (
@@ -516,7 +556,7 @@ export default function PortalPage() {
           ) : (
             <>
               {activeTab === 'dashboard' && <DashboardTab stats={stats} leads={leads} />}
-              {activeTab === 'leads' && <LeadsTab leads={leads} />}
+              {activeTab === 'leads' && <LeadsTab leads={leads} onRefresh={fetchData} />}
               {activeTab === 'appointments' && <AppointmentsTab appointments={appointments} />}
               {activeTab === 'admin' && isAdmin && <AdminTab userEmail={userEmail} />}
             </>

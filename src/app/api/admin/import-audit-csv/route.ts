@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized to import' }, { status: 401 })
-    }
     const formData = await req.formData()
     const file = formData.get('file') as File
 
@@ -39,49 +32,32 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    let clientId = formData.get('client_id') as string
-
-    // Check if acting normally, lookup client_id from user.id
-    if (!clientId) {
-      const { data: clientData } = await adminClient
-        .from('clients')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
-      if (clientData) {
-        clientId = clientData.id
-      }
-    }
-
-    if (!clientId) {
-      return NextResponse.json({ error: 'Could not determine a valid client profile to assign these leads' }, { status: 400 })
-    }
-
-    const leads = []
+    const auditLeads = []
     for (let i = 1; i < lines.length; i++) {
+        // Simple manual split that doesn't respect quotes, consider a CSV parser for production
+        // But for quick imports with simple data this works
       const values = lines[i].split(',').map(v => v.trim())
-      const row = Object.fromEntries(headers.map((header, idx) => [header, values[idx]]))
+      const row = Object.fromEntries(headers.map((header, idx) => [header, values[idx] || '']))
 
       if (!row.name || !row.email) continue
 
-      leads.push({
-        client_id: clientId,
-        lead_name: row.name,
+      auditLeads.push({
+        name: row.name,
         email: row.email,
         phone: row.phone || null,
-        source: row.source || 'csv_import',
-        message: row.message || null,
-        status: row.status || 'new',
+        business_name: row.business || row.company || row.business_name || null,
+        revenue_range: row.revenue || null,
+        status: 'pending',
       })
     }
 
-    if (leads.length === 0) {
+    if (auditLeads.length === 0) {
       return NextResponse.json({ error: 'No valid leads found in CSV' }, { status: 400 })
     }
 
     const { data, error } = await adminClient
-      .from('leads')
-      .insert(leads)
+      .from('audit_leads')
+      .insert(auditLeads)
       .select()
 
     if (error) {
@@ -91,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully imported ${data?.length || 0} leads`,
+      message: `Successfully imported ${data?.length || 0} prospects into Audit Leads`,
       count: data?.length || 0,
     })
   } catch (err) {

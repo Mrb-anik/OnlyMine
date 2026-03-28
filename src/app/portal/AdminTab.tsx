@@ -13,6 +13,10 @@ export function AdminTab({ userEmail }: { userEmail: string }) {
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState('')
 
+  const [auditUploadFile, setAuditUploadFile] = useState<File | null>(null)
+  const [auditUploading, setAuditUploading] = useState(false)
+  const [auditUploadSuccess, setAuditUploadSuccess] = useState('')
+
   useEffect(() => {
     fetch('/api/admin/dashboard')
       .then(res => res.json())
@@ -54,6 +58,32 @@ export function AdminTab({ userEmail }: { userEmail: string }) {
     }
   }
 
+  const handleAuditUpload = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!auditUploadFile) {
+       setError('Please select a CSV file.')
+       return
+    }
+    setAuditUploading(true)
+    setError('')
+    setAuditUploadSuccess('')
+
+    const formData = new FormData()
+    formData.append('file', auditUploadFile)
+
+    try {
+      const res = await fetch('/api/admin/import-audit-csv', { method: 'POST', body: formData })
+      const json = await res.json()
+      if (res.ok) setAuditUploadSuccess(json.message)
+      else setError(json.error || 'Upload failed')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setAuditUploading(false)
+      setAuditUploadFile(null)
+    }
+  }
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault()
     setSavingSettings(true)
@@ -87,6 +117,7 @@ export function AdminTab({ userEmail }: { userEmail: string }) {
 
       {error && <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl flex items-center gap-2"><AlertCircle className="w-4 h-4" /> {error}</div>}
       {uploadSuccess && <div className="p-4 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl flex items-center gap-2"><CheckCircle className="w-4 h-4" /> {uploadSuccess}</div>}
+      {auditUploadSuccess && <div className="p-4 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl flex items-center gap-2"><CheckCircle className="w-4 h-4" /> {auditUploadSuccess}</div>}
       {settingsSuccess && <div className="p-4 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl flex items-center gap-2"><CheckCircle className="w-4 h-4" /> {settingsSuccess}</div>}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -116,12 +147,30 @@ export function AdminTab({ userEmail }: { userEmail: string }) {
              <label className="text-xs text-white/60 mb-2 block font-bold uppercase tracking-wider">CSV File</label>
              <input type="file" accept=".csv" className="form-input !p-2 cursor-pointer" onChange={e => setUploadFile(e.target.files?.[0] || null)} required />
            </div>
-           <button type="submit" disabled={uploading || !uploadFile || !uploadClientId} className="btn-primary w-full md:w-auto h-11 px-8 rounded-xl font-bold hover:-translate-y-0.5 transition-all">
+           <button type="submit" disabled={uploading || !uploadFile || !uploadClientId} className="btn-primary w-full md:w-auto h-11 px-8 rounded-xl font-bold hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0">
              {uploading ? 'Uploading...' : 'Import Leads'}
            </button>
          </form>
          <div className="px-6 pb-6 text-xs text-white/40">
            Note: The CSV must contain at minimum 'name' and 'email' header columns.
+         </div>
+      </div>
+
+      <div className="glass-card rounded-2xl overflow-hidden mt-8">
+         <div className="p-6 border-b border-white/10 font-bold flex items-center gap-2">
+           <UploadCloud className="w-5 h-5 text-[#00D9FF]" /> Upload Prospect Leads (Audit System)
+         </div>
+         <form onSubmit={handleAuditUpload} className="p-6 flex flex-col md:flex-row gap-4 items-end">
+           <div className="flex-1 w-full">
+             <label className="text-xs text-white/60 mb-2 block font-bold uppercase tracking-wider">CSV Prospect File</label>
+             <input type="file" accept=".csv" className="form-input !p-2 cursor-pointer" onChange={e => setAuditUploadFile(e.target.files?.[0] || null)} required />
+           </div>
+           <button type="submit" disabled={auditUploading || !auditUploadFile} className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto h-11 px-8 rounded-xl font-bold hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: '#00D9FF', color: '#000' }}>
+             {auditUploading ? 'Processing...' : 'Import Prospects'}
+           </button>
+         </form>
+         <div className="px-6 pb-6 text-xs text-white/40">
+           Import potential targets. The CSV requires matching 'name' and 'email' at minimum. These will drop into the follow-up engine.
          </div>
       </div>
 
