@@ -32,6 +32,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const clientId = formData.get('client_id') as string
+    if (!clientId) {
+      return NextResponse.json({ error: 'Client ID is required to import leads' }, { status: 400 })
+    }
+
     const leads = []
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim())
@@ -40,6 +45,7 @@ export async function POST(req: NextRequest) {
       if (!row.name || !row.email) continue
 
       leads.push({
+        client_id: clientId,
         lead_name: row.name,
         email: row.email,
         phone: row.phone || null,

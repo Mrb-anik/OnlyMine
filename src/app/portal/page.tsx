@@ -6,8 +6,9 @@ import Link from 'next/link'
 import {
   Zap, BarChart2, Users, Calendar, LogOut, RefreshCw,
   TrendingUp, Clock, ArrowUp, Menu,
-  Phone, Mail, AlertCircle
+  Phone, Mail, AlertCircle, Settings
 } from 'lucide-react'
+import { AdminTab } from './AdminTab'
 import { createClient } from '@/lib/supabase/client'
 import type { Lead, Appointment, DashboardStats } from '@/lib/types'
 
@@ -44,18 +45,22 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-function Sidebar({ active, setActive, onLogout, mobileOpen, setMobileOpen }: {
+function Sidebar({ active, setActive, onLogout, mobileOpen, setMobileOpen, isAdmin }: {
   active: string
   setActive: (v: string) => void
   onLogout: () => void
   mobileOpen: boolean
   setMobileOpen: (v: boolean) => void
+  isAdmin: boolean
 }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <BarChart2 className="w-5 h-5" /> },
     { id: 'leads', label: 'Leads', icon: <Users className="w-5 h-5" /> },
     { id: 'appointments', label: 'Appointments', icon: <Calendar className="w-5 h-5" /> },
   ]
+  if (isAdmin) {
+    navItems.push({ id: 'admin', label: 'Admin Hub', icon: <Settings className="w-5 h-5" /> })
+  }
 
   const Content = () => (
     <div className="flex flex-col h-full">
@@ -364,7 +369,10 @@ export default function PortalPage() {
   const [stats, setStats] = useState<DashboardStats>({ totalLeads: 0, avgResponseTime: 0, bookedAppointments: 0, conversionRate: 0 })
   const [loading, setLoading] = useState(true)
   const [userEmail, setUserEmail] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
   const [error, setError] = useState('')
+
+  const ADMIN_EMAILS = ['hello@leadmatrixllc.us', 'mrb.work.aus@gmail.com', 'admin@leadmatrixllc.us', 'mrb.anik@yahoo.com']
 
   const getTimeFilter = useCallback((tf: string) => {
     const now = new Date()
@@ -382,7 +390,9 @@ export default function PortalPage() {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
-    setUserEmail(user.email ?? '')
+    const email = user.email ?? ''
+    setUserEmail(email)
+    setIsAdmin(ADMIN_EMAILS.includes(email))
 
     const timeFilter = getTimeFilter(timeframe)
 
@@ -441,6 +451,7 @@ export default function PortalPage() {
         onLogout={handleLogout}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
+        isAdmin={isAdmin}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -507,6 +518,7 @@ export default function PortalPage() {
               {activeTab === 'dashboard' && <DashboardTab stats={stats} leads={leads} />}
               {activeTab === 'leads' && <LeadsTab leads={leads} />}
               {activeTab === 'appointments' && <AppointmentsTab appointments={appointments} />}
+              {activeTab === 'admin' && isAdmin && <AdminTab userEmail={userEmail} />}
             </>
           )}
         </main>
