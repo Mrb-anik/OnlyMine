@@ -57,21 +57,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Could not determine a valid client profile to assign these leads' }, { status: 400 })
     }
 
+    // Fuzzy matching functions
+    const findIndex = (keywords: string[]) => headers.findIndex(h => keywords.some(k => h.includes(k)))
+    
+    const nameIdx = findIndex(['name', 'first', 'contact', 'person'])
+    const emailIdx = findIndex(['email', 'e-mail', 'mail'])
+    const phoneIdx = findIndex(['phone', 'mobile', 'cell', 'number', 'tel'])
+    const srcIdx = findIndex(['source', 'from', 'medium'])
+    const msgIdx = findIndex(['message', 'note', 'comment'])
+
     const leads = []
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map(v => v.trim())
-      const row = Object.fromEntries(headers.map((header, idx) => [header, values[idx]]))
-
-      if (!row.name || !row.email) continue
+      // Split ignoring commas inside quotes
+      const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)?.map(v => v.replace(/^"|"$/g, '').trim()) || lines[i].split(',').map(v => v.trim())
+      
+      const rawName = nameIdx >= 0 ? values[nameIdx] : ''
+      const rawEmail = emailIdx >= 0 ? values[emailIdx] : ''
+      
+      const finalName = rawName || 'Unknown Lead'
+      const finalEmail = rawEmail || `unknown-${Date.now()}-${i}@example.com`
 
       leads.push({
         client_id: clientId,
-        lead_name: row.name,
-        email: row.email,
-        phone: row.phone || null,
-        source: row.source || 'csv_import',
-        message: row.message || null,
-        status: row.status || 'new',
+        lead_name: finalName,
+        email: finalEmail,
+        phone: phoneIdx >= 0 ? values[phoneIdx] : null,
+        source: srcIdx >= 0 && values[srcIdx] ? values[srcIdx] : 'csv_import',
+        message: msgIdx >= 0 ? values[msgIdx] : null,
+        status: 'new',
       })
     }
 

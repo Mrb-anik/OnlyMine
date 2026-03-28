@@ -131,31 +131,6 @@ export function AdminTab({ userEmail }: { userEmail: string }) {
         </div>
       </div>
 
-      <div className="glass-card rounded-2xl overflow-hidden">
-         <div className="p-6 border-b border-white/10 font-bold flex items-center gap-2">
-           <UploadCloud className="w-5 h-5 text-[#FF6B35]" /> Upload Leads CSV
-         </div>
-         <form onSubmit={handleUpload} className="p-6 flex flex-col md:flex-row gap-4 items-end">
-           <div className="flex-1">
-             <label className="text-xs text-white/60 mb-2 block font-bold uppercase tracking-wider">Select Client</label>
-             <select className="form-input" value={uploadClientId} onChange={e => setUploadClientId(e.target.value)} required>
-               <option value="">-- Choose a Client --</option>
-               {data.clients.map((c: any) => <option key={c.id} value={c.id}>{c.business_name} ({c.email})</option>)}
-             </select>
-           </div>
-           <div className="flex-1">
-             <label className="text-xs text-white/60 mb-2 block font-bold uppercase tracking-wider">CSV File</label>
-             <input type="file" accept=".csv" className="form-input !p-2 cursor-pointer" onChange={e => setUploadFile(e.target.files?.[0] || null)} required />
-           </div>
-           <button type="submit" disabled={uploading || !uploadFile || !uploadClientId} className="btn-primary w-full md:w-auto h-11 px-8 rounded-xl font-bold hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0">
-             {uploading ? 'Uploading...' : 'Import Leads'}
-           </button>
-         </form>
-         <div className="px-6 pb-6 text-xs text-white/40">
-           Note: The CSV must contain at minimum 'name' and 'email' header columns.
-         </div>
-      </div>
-
       <div className="glass-card rounded-2xl overflow-hidden mt-8">
          <div className="p-6 border-b border-white/10 font-bold flex items-center gap-2">
            <UploadCloud className="w-5 h-5 text-[#00D9FF]" /> Upload Prospect Leads (Audit System)
@@ -170,7 +145,7 @@ export function AdminTab({ userEmail }: { userEmail: string }) {
            </button>
          </form>
          <div className="px-6 pb-6 text-xs text-white/40">
-           Import potential targets. The CSV requires matching 'name' and 'email' at minimum. These will drop into the follow-up engine.
+           Import potential targets. The engine will automatically locate the closest matching columns for names, emails, phones, and business names.
          </div>
       </div>
 

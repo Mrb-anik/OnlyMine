@@ -22,31 +22,33 @@ export async function POST(req: NextRequest) {
     }
 
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
-    const requiredHeaders = ['name', 'email']
-    const hasRequiredHeaders = requiredHeaders.every(header => headers.includes(header))
-
-    if (!hasRequiredHeaders) {
-      return NextResponse.json(
-        { error: 'CSV must contain "name" and "email" columns' },
-        { status: 400 }
-      )
-    }
+    
+    // Fuzzy matching functions
+    const findIndex = (keywords: string[]) => headers.findIndex(h => keywords.some(k => h.includes(k)))
+    
+    const nameIdx = findIndex(['name', 'first', 'contact', 'person'])
+    const emailIdx = findIndex(['email', 'e-mail', 'mail'])
+    const phoneIdx = findIndex(['phone', 'mobile', 'cell', 'number', 'tel'])
+    const businessIdx = findIndex(['business', 'company', 'org', 'dealership'])
+    const revIdx = findIndex(['revenue', 'income', 'sales'])
 
     const auditLeads = []
     for (let i = 1; i < lines.length; i++) {
-        // Simple manual split that doesn't respect quotes, consider a CSV parser for production
-        // But for quick imports with simple data this works
-      const values = lines[i].split(',').map(v => v.trim())
-      const row = Object.fromEntries(headers.map((header, idx) => [header, values[idx] || '']))
-
-      if (!row.name || !row.email) continue
+      // Split ignoring commas inside quotes
+      const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)?.map(v => v.replace(/^"|"$/g, '').trim()) || lines[i].split(',').map(v => v.trim())
+      
+      const rawName = nameIdx >= 0 ? values[nameIdx] : ''
+      const rawEmail = emailIdx >= 0 ? values[emailIdx] : ''
+      
+      const finalName = rawName || 'Unknown Contact'
+      const finalEmail = rawEmail || `unknown-${Date.now()}-${i}@example.com`
 
       auditLeads.push({
-        name: row.name,
-        email: row.email,
-        phone: row.phone || null,
-        business_name: row.business || row.company || row.business_name || null,
-        revenue_range: row.revenue || null,
+        name: finalName,
+        email: finalEmail,
+        phone: phoneIdx >= 0 ? values[phoneIdx] : null,
+        business_name: businessIdx >= 0 ? values[businessIdx] : null,
+        revenue_range: revIdx >= 0 ? values[revIdx] : null,
         status: 'pending',
       })
     }
