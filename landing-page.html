@@ -3,32 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeadCapture Pro - Stop Losing Leads to Voicemail</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Lead Matrix | Automated Revenue Engines for Service Businesses</title>
+    <meta name="description" content="We don't sell leads. We build automated revenue systems that capture, qualify, and convert leads into high-ticket revenue—predictably.">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #05070A;
+            --surface: #0A0E14;
+            --surface-light: #121720;
+            --primary: #FF6B35;
+            --primary-glow: rgba(255, 107, 53, 0.3);
+            --accent: #00F5FF;
+            --accent-glow: rgba(0, 245, 255, 0.3);
+            --text: #FFFFFF;
+            --text-muted: #8F9BB3;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #FF6B35;
-            --primary-dark: #E64D1F;
-            --secondary: #FFA500;
-            --dark: #0A0E27;
-            --dark-gray: #1A1F3A;
-            --light-gray: #E8EBF3;
-            --white: #FFFFFF;
-            --accent: #00D9FF;
-        }
-
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--dark);
-            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
         }
 
         /* Navigation */
@@ -36,16 +53,14 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 5%;
+            padding: 1.5rem 0;
+            background: rgba(5, 7, 10, 0.8);
+            backdrop-filter: blur(12px);
             z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--border);
         }
 
         nav .container {
-            max-width: 1400px;
-            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -55,896 +70,605 @@
             font-family: 'Syne', sans-serif;
             font-size: 1.5rem;
             font-weight: 800;
-            color: var(--primary);
+            color: var(--text);
             text-decoration: none;
-        }
-
-        .nav-cta {
-            background: var(--primary);
-            color: var(--white);
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid var(--primary);
-        }
-
-        .nav-cta:hover {
-            background: transparent;
-            transform: translateY(-2px);
-        }
-
-        /* Hero Section */
-        .hero {
-            margin-top: 80px;
-            padding: 8rem 5% 6rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: pulse 8s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.5; }
-        }
-
-        .hero-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(255, 107, 53, 0.15);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 5rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            max-width: 900px;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        .hero-highlight {
-            color: var(--primary);
-            position: relative;
-            display: inline-block;
-        }
-
-        .hero-subtitle {
-            font-size: 1.4rem;
-            color: rgba(255, 255, 255, 0.8);
-            max-width: 700px;
-            margin-bottom: 3rem;
-            line-height: 1.7;
-            animation: fadeInUp 0.8s ease 0.4s both;
-        }
-
-        .hero-cta-group {
             display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            margin-bottom: 3rem;
-            animation: fadeInUp 0.8s ease 0.6s both;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-            padding: 1.2rem 3rem;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            border: 2px solid var(--primary);
-            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        .logo span {
+            color: var(--primary);
         }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--white);
-            padding: 1.2rem 3rem;
-            border-radius: 12px;
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
             text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--glass);
+            border-color: var(--text);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 12rem 0 8rem;
+            position: relative;
+            background: radial-gradient(circle at 80% 20%, var(--primary-glow) 0%, transparent 40%),
+                        radial-gradient(circle at 20% 80%, var(--accent-glow) 0%, transparent 40%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.75rem;
             font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            line-height: 0.95;
+            margin-bottom: 2rem;
+        }
+
+        h1 span {
+            color: var(--primary);
+            display: block;
+        }
+
+        .hero-sub {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 3rem;
+        }
+
+        .hero-visual {
+            margin-top: 5rem;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+        }
+
+        .hero-visual img {
+            width: 100%;
+            display: block;
+        }
+
+        /* manifesto section */
+        .manifesto {
+            padding: 8rem 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .section-header {
+            margin-bottom: 5rem;
+        }
+
+        .label {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .manifesto-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .manifesto-text h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .manifesto-text p {
             font-size: 1.1rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .comparison {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comp-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .comp-val {
+            font-weight: 700;
+        }
+
+        .comp-bad { color: #FF4D4D; }
+        .comp-good { color: var(--accent); }
+
+        /* Custom Dashboard Section */
+        .dashboards {
+            padding: 8rem 0;
+            background: var(--surface-light);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .dash-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 12px;
             transition: all 0.3s ease;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--white);
-            background: rgba(255, 255, 255, 0.1);
+        .dash-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
         }
 
-        .hero-stats {
+        .dash-icon {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .dash-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .dash-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dash-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Case Study Section */
+        .case-study {
+            padding: 10rem 0;
+        }
+
+        .case-card {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 3rem;
-            max-width: 800px;
-            animation: fadeInUp 0.8s ease 0.8s both;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 4rem;
+            align-items: center;
         }
 
-        .stat {
-            text-align: left;
+        .case-content h2 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
         }
 
-        .stat-number {
-            font-family: 'Syne', sans-serif;
-            font-size: 3rem;
+        .case-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            padding: 2rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .stat-val {
+            display: block;
+            font-size: 2.5rem;
             font-weight: 800;
             color: var(--primary);
-            display: block;
+            font-family: 'Syne', sans-serif;
         }
 
         .stat-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        /* Problem Section */
-        .problem {
-            padding: 6rem 5%;
-            background: linear-gradient(180deg, var(--dark) 0%, var(--dark-gray) 100%);
+        /* Pricing/Partnership */
+        .partnership {
+            padding: 8rem 0;
+            text-align: center;
         }
 
-        .section-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-badge {
-            display: inline-block;
-            background: rgba(255, 107, 53, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 3rem;
-            line-height: 1.2;
-        }
-
-        .problem-grid {
+        .partnership-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
             margin-top: 4rem;
+            text-align: left;
         }
 
-        .problem-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 2.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .problem-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            background: rgba(255, 107, 53, 0.05);
-        }
-
-        .problem-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .problem-card h3 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .problem-card p {
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.7;
-        }
-
-        .problem-stat {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        /* Solution Section */
-        .solution {
-            padding: 6rem 5%;
-            background: var(--dark-gray);
-        }
-
-        .solution-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5rem;
-            align-items: center;
-            margin-top: 4rem;
-        }
-
-        .solution-features {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .feature {
-            display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
-        }
-
-        .feature-icon {
-            background: var(--primary);
-            color: var(--white);
-            width: 50px;
-            height: 50px;
+        .partner-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 4rem;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .feature-content h4 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-content p {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .solution-visual {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 3rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .solution-visual::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,107,53,0.2) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .dashboard-preview {
-            background: var(--dark);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dashboard-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .status-badge {
-            background: rgba(0, 217, 255, 0.2);
-            color: var(--accent);
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .metric-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .metric {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 1rem;
-            border-radius: 8px;
-        }
-
-        .metric-label {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 0.3rem;
-        }
-
-        .metric-value {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        /* Pricing Section */
-        .pricing {
-            padding: 6rem 5%;
-            background: var(--dark);
-        }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-
-        .pricing-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 3rem;
-            transition: all 0.3s ease;
             position: relative;
         }
 
-        .pricing-card.featured {
+        .partner-card.featured {
             border-color: var(--primary);
-            background: rgba(255, 107, 53, 0.05);
-            transform: scale(1.05);
+            background: radial-gradient(circle at top right, rgba(255, 107, 53, 0.1), transparent);
         }
 
-        .pricing-card.featured::before {
-            content: 'MOST POPULAR';
+        .partner-card.featured::after {
+            content: 'Recommended';
             position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 2rem;
+            right: 2rem;
+            padding: 0.3rem 0.8rem;
             background: var(--primary);
-            color: var(--white);
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
+            color: white;
+            font-size: 0.7rem;
             font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
         }
 
-        .pricing-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary);
+        .price-tag {
+            margin: 2rem 0;
         }
 
-        .pricing-card.featured:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-
-        .pricing-name {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .pricing-desc {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        .pricing-price {
-            margin-bottom: 2rem;
-        }
-
-        .price {
-            font-family: 'Syne', sans-serif;
-            font-size: 3.5rem;
+        .price-tag .amount {
+            font-size: 4rem;
             font-weight: 800;
-            color: var(--primary);
+            font-family: 'Syne', sans-serif;
         }
 
-        .price-period {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 1rem;
+        .price-tag .period {
+            color: var(--text-muted);
         }
 
-        .pricing-features {
+        .partner-list {
             list-style: none;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
 
-        .pricing-features li {
+        .partner-list li {
             padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
             gap: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
         }
 
-        .pricing-features li::before {
-            content: '✓';
+        .partner-list li::before {
+            content: '→';
             color: var(--primary);
-            font-weight: 700;
-            font-size: 1.2rem;
         }
 
-        .pricing-cta {
-            width: 100%;
-            background: var(--primary);
-            color: var(--white);
-            padding: 1rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 700;
+        /* CTA */
+        .final-cta {
+            padding: 10rem 0;
             text-align: center;
-            display: block;
-            transition: all 0.3s ease;
-            border: 2px solid var(--primary);
-        }
-
-        .pricing-cta:hover {
-            background: transparent;
-            transform: translateY(-2px);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 6rem 5%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--bg);
             position: relative;
-            overflow: hidden;
         }
 
-        .cta-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -20%;
-            width: 600px;
-            height: 600px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .cta-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-content h2 {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .cta-content p {
-            font-size: 1.3rem;
+        .final-cta h2 {
+            font-size: 4rem;
             margin-bottom: 3rem;
-            opacity: 0.95;
         }
 
         /* Footer */
         footer {
-            background: var(--dark-gray);
-            padding: 3rem 5%;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
-        footer p {
-            color: rgba(255, 255, 255, 0.6);
+        footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Responsive */
         @media (max-width: 1024px) {
-            h1 {
-                font-size: 3.5rem;
-            }
-
-            .solution-content,
-            .problem-grid {
+            .manifesto-grid, .case-card {
                 grid-template-columns: 1fr;
             }
-
-            .pricing-grid {
-                grid-template-columns: 1fr;
+            .case-card {
+                padding: 2rem;
             }
-
-            .pricing-card.featured {
-                transform: scale(1);
-            }
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            h2 {
-                font-size: 2rem;
-            }
-
-            .hero {
-                padding: 4rem 5% 3rem;
-            }
-
-            .hero-cta-group {
-                flex-direction: column;
-            }
-
-            .hero-stats {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
+            h1 { font-size: 4rem; }
         }
     </style>
 </head>
 <body>
+
     <nav>
         <div class="container">
-            <a href="#" class="logo">LeadCapture Pro</a>
-            <a href="#pricing" class="nav-cta">Get Started Free</a>
+            <a href="#" class="logo">LEAD<span>MATRIX</span></a>
+            <div class="nav-links">
+                <a href="#system">The System</a>
+                <a href="#dashboards">Dashboards</a>
+                <a href="#results">Results</a>
+            </div>
+            <a href="#contact" class="btn btn-primary">Audit My Pipeline</a>
         </div>
     </nav>
 
     <section class="hero">
-        <div class="hero-content">
-            <span class="hero-badge">🚀 Trusted by 200+ Home Service Businesses</span>
-            
-            <h1>Stop Losing Leads<br>to <span class="hero-highlight">Faster Competitors</span></h1>
-            
-            <p class="hero-subtitle">
-                Respond in 60 seconds. Book appointments automatically. 
-                Capture 40% more leads without adding staff.
-            </p>
-
-            <div class="hero-cta-group">
-                <a href="#pricing" class="btn-primary">
-                    Start Free Audit →
-                </a>
-                <a href="#demo" class="btn-secondary">Watch 2-Min Demo</a>
+        <div class="container">
+            <div class="hero-content">
+                <span class="badge">Beyond Lead Generation</span>
+                <h1>We Don't Sell Leads.<span>We Build Revenue.</span></h1>
+                <p class="hero-sub">Marketing agencies bring traffic. We install end-to-end systems that capture, qualify, and convert leads into high-ticket revenue—predictably.</p>
+                <div class="hero-actions">
+                    <a href="#contact" class="btn btn-primary">Audit Your Revenue Pipeline</a>
+                    <a href="#system" class="btn btn-outline" style="margin-left: 1rem;">See The Stack</a>
+                </div>
             </div>
-
-            <div class="hero-stats">
-                <div class="stat">
-                    <span class="stat-number">60s</span>
-                    <span class="stat-label">Average Response Time</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-number">40%</span>
-                    <span class="stat-label">More Leads Captured</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">Automated Booking</span>
-                </div>
+            <div class="hero-visual">
+                <img src="./public/revenue-dashboard.png" alt="Revenue Command Center Dashboard">
             </div>
         </div>
     </section>
 
-    <section class="problem">
-        <div class="section-container">
-            <span class="section-badge">THE PROBLEM</span>
-            <h2>Your Business Is Bleeding Revenue</h2>
-            
-            <div class="problem-grid">
-                <div class="problem-card">
-                    <div class="problem-icon">📞</div>
-                    <h3>After-Hours Calls Go to Voicemail</h3>
-                    <p>
-                        <span class="problem-stat">40-60% of leads</span> come outside 
-                        business hours. While you sleep, competitors with automated 
-                        response systems are capturing your customers.
-                    </p>
+    <section class="manifesto" id="system">
+        <div class="container">
+            <div class="manifesto-grid">
+                <div class="manifesto-text">
+                    <span class="label">The Anti-Agency Model</span>
+                    <h2>The Marketing Agency Model is Broken.</h2>
+                    <p>Agencies care about "impressions" and "clicks." We care about the money in your bank. While they celebrate "reach," we celebrate realized ROI.</p>
+                    <p>We replace manual chaos with automated precision. No more missed calls, no more human follow-up errors, no more guessing where your next deal is coming from.</p>
+                    <a href="#contact" class="btn btn-outline">Stop Gambling on Visibility</a>
                 </div>
-
-                <div class="problem-card">
-                    <div class="problem-icon">⏰</div>
-                    <h3>Customers Choose Fastest Response</h3>
-                    <p>
-                        <span class="problem-stat">78% of customers</span> hire the 
-                        first contractor who responds - not the cheapest or best reviewed. 
-                        Speed wins.
-                    </p>
-                </div>
-
-                <div class="problem-card">
-                    <div class="problem-icon">😤</div>
-                    <h3>Manual Scheduling Chaos</h3>
-                    <p>
-                        Your team wastes <span class="problem-stat">15-20 hours weekly</span> 
-                        playing phone tag, double-booking, and manually managing calendars.
-                    </p>
-                </div>
-
-                <div class="problem-card">
-                    <div class="problem-icon">💸</div>
-                    <h3>Lost Revenue You Can't See</h3>
-                    <p>
-                        If you're doing $2M/year and losing just 30% of leads, that's 
-                        <span class="problem-stat">$600K walking out the door</span> annually.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="solution">
-        <div class="section-container">
-            <span class="section-badge">THE SOLUTION</span>
-            <h2>Response & Revenue Accelerator</h2>
-
-            <div class="solution-content">
-                <div class="solution-features">
-                    <div class="feature">
-                        <div class="feature-icon">⚡</div>
-                        <div class="feature-content">
-                            <h4>60-Second Auto-Response</h4>
-                            <p>AI-powered system responds to every call, text, and form 
-                            submission instantly - 24/7, 365 days.</p>
-                        </div>
+                <div class="comparison">
+                    <div class="comparison-row">
+                        <div><span class="comp-label">Typical Agency</span><span class="comp-val comp-bad">Vague "Lead Quality"</span></div>
+                        <div><span class="comp-label">Lead Matrix Partnership</span><span class="comp-val comp-good">Verified Revenue Growth</span></div>
                     </div>
-
-                    <div class="feature">
-                        <div class="feature-icon">📅</div>
-                        <div class="feature-content">
-                            <h4>Automated Appointment Booking</h4>
-                            <p>Customers book directly into your calendar. No phone tag. 
-                            No back-and-forth. Just appointments.</p>
-                        </div>
+                    <div class="comparison-row">
+                        <div><span class="comp-label">Typical Agency</span><span class="comp-val comp-bad">Manual Outreach</span></div>
+                        <div><span class="comp-label">Lead Matrix Partnership</span><span class="comp-val comp-good">60s Auto-Response</span></div>
                     </div>
-
-                    <div class="feature">
-                        <div class="feature-icon">🎯</div>
-                        <div class="feature-content">
-                            <h4>Smart Lead Routing</h4>
-                            <p>Emergency calls get priority. Regular inquiries get nurture 
-                            sequences. Every lead handled perfectly.</p>
-                        </div>
-                    </div>
-
-                    <div class="feature">
-                        <div class="feature-icon">📊</div>
-                        <div class="feature-content">
-                            <h4>Real-Time Dashboard</h4>
-                            <p>See exactly where every lead came from, how fast you responded, 
-                            and what's converting. Data you can act on.</p>
-                        </div>
-                    </div>
-
-                    <div class="feature">
-                        <div class="feature-icon">🔄</div>
-                        <div class="feature-content">
-                            <h4>Automatic Follow-Up</h4>
-                            <p>No-shows get rescheduling texts. Completed jobs get review 
-                            requests. Old leads get re-engaged. All automatic.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="solution-visual">
-                    <div class="dashboard-preview">
-                        <div class="dashboard-header">
-                            <span class="dashboard-title">📊 Today's Performance</span>
-                            <span class="status-badge">● LIVE</span>
-                        </div>
-                        
-                        <div class="metric-row">
-                            <div class="metric">
-                                <div class="metric-label">New Leads</div>
-                                <div class="metric-value">23</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-label">Booked</div>
-                                <div class="metric-value">15</div>
-                            </div>
-                        </div>
-
-                        <div class="metric-row">
-                            <div class="metric">
-                                <div class="metric-label">Response Time</div>
-                                <div class="metric-value">42s</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-label">Conversion</div>
-                                <div class="metric-value">65%</div>
-                            </div>
-                        </div>
+                    <div class="comparison-row">
+                        <div><span class="comp-label">Typical Agency</span><span class="comp-val comp-bad">Excel Spreadsheets</span></div>
+                        <div><span class="comp-label">Lead Matrix Partnership</span><span class="comp-val comp-good">Real-Time Decision Dashboards</span></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="pricing" id="pricing">
-        <div class="section-container">
-            <span class="section-badge">PRICING</span>
-            <h2>Choose Your Growth Plan</h2>
+    <section class="dashboards" id="dashboards">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">The Edge</span>
+                <h2>Data is Noise. Decisions are Revenue.</h2>
+                <p style="max-width: 600px; color: var(--text-muted);">Generic dashboards fail because they show you what happened, not what to do. Our systems tell you exactly where you're losing or making money.</p>
+            </div>
 
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <div class="pricing-name">Speed-to-Lead</div>
-                    <div class="pricing-desc">Perfect for growing contractors</div>
-                    
-                    <div class="pricing-price">
-                        <span class="price">$997</span>
-                        <span class="price-period">/month</span>
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <div class="dash-icon">🛰️</div>
+                    <h3>Revenue Command Center</h3>
+                    <p>Your main weapon. Tracks total revenue, ROAS, and pipeline value across all channels in real-time.</p>
+                    <div class="dash-metric"><span>Real-Time ROAS</span><span>4.2x</span></div>
+                    <div class="dash-metric"><span>Pipeline Value</span><span>$1.2M</span></div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon">⚙️</div>
+                    <h3>The Lead Engine</h3>
+                    <p>Proves you don't just bring traffic—you control flow. Tracks source-to-close conversion rates.</p>
+                    <div class="dash-metric"><span>Cost Per Lead</span><span>$42.00</span></div>
+                    <div class="dash-metric"><span>Conv. Rate</span><span>34%</span></div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon">💀</div>
+                    <h3>Bottleneck Detector</h3>
+                    <p>The elite feature. Identifies where leads are getting stuck in your sales process so you can fix it instantly.</p>
+                    <div class="dash-metric"><span>Lead Leakage</span><span>4.2%</span></div>
+                    <div class="dash-metric"><span>Stalled Deals</span><span>12</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="case-study" id="results">
+        <div class="container">
+            <div class="case-card">
+                <div class="case-content">
+                    <span class="label">Project StoreX</span>
+                    <h2>From Manual Chaos to $1.2M Pipeline.</h2>
+                    <p>A high-ticket service operator was losing 40% of their leads to voicemail and human error. We deployed the Lead Matrix Revenue Stack + StoreX custom builder.</p>
+                    <div class="case-stats">
+                        <div class="stat-item">
+                            <span class="stat-val">312%</span>
+                            <span class="stat-label">ROI Increase</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-val">60s</span>
+                            <span class="stat-label">Response Time</span>
+                        </div>
                     </div>
+                </div>
+                <div class="case-visual">
+                    <div style="background: var(--bg); border: 1px solid var(--border); padding: 2rem; border-radius: 12px;">
+                        <h4 style="margin-bottom: 1.5rem; color: var(--accent);">The Transformation</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">"Before Lead Matrix, we were guessing. Now we have a predictable engine. We don't just see leads, we see our entire future revenue."</p>
+                        <p style="font-weight: 700; font-size: 0.8rem;">— CEO, High-Ticket Service Group</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <ul class="pricing-features">
-                        <li>60-second auto-response</li>
-                        <li>Automated booking calendar</li>
-                        <li>Missed call text-back</li>
-                        <li>Basic performance dashboard</li>
-                        <li>7-day setup guarantee</li>
-                        <li>Email support</li>
+    <section class="partnership">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Partnerships</span>
+                <h2>Choose Your Growth Velocity.</h2>
+            </div>
+            <div class="partnership-grid">
+                <div class="partner-card">
+                    <h3>The System Buildout</h3>
+                    <p>Full installation of your revenue stack.</p>
+                    <div class="price-tag">
+                        <span class="amount">$5,000</span>
+                        <span class="period">setup</span>
+                    </div>
+                    <ul class="partner-list">
+                        <li>Omni-Capture Setup</li>
+                        <li>Auto-Response Logic</li>
+                        <li>Standard Dashboard</li>
+                        <li>60-Day Support</li>
                     </ul>
-
-                    <a href="#contact" class="pricing-cta">Get Started →</a>
+                    <a href="#contact" class="btn btn-outline" style="width: 100%;">Apply Now</a>
                 </div>
-
-                <div class="pricing-card featured">
-                    <div class="pricing-name">Complete Transformation</div>
-                    <div class="pricing-desc">For serious growth operators</div>
-                    
-                    <div class="pricing-price">
-                        <span class="price">$2,497</span>
-                        <span class="price-period">/month</span>
+                <div class="partner-card featured">
+                    <h3>The Revenue Engine</h3>
+                    <p>Complete end-to-end partnership.</p>
+                    <div class="price-tag">
+                        <span class="amount">$2,500</span>
+                        <span class="period">/mo + setup</span>
                     </div>
-
-                    <ul class="pricing-features">
-                        <li>Everything in Speed-to-Lead</li>
-                        <li>Full field service software</li>
-                        <li>AI dispatch optimization</li>
-                        <li>Auto review requests</li>
-                        <li>Payment processing</li>
-                        <li>Priority phone support</li>
-                        <li>Monthly optimization</li>
+                    <ul class="partner-list">
+                        <li>Everything in Buildout</li>
+                        <li>Custom Executive Dashboard</li>
+                        <li>Bottleneck Detection</li>
+                        <li>Weekly ROI Optimization</li>
+                        <li>Priority Partnership Status</li>
                     </ul>
-
-                    <a href="#contact" class="pricing-cta">Get Started →</a>
-                </div>
-
-                <div class="pricing-card">
-                    <div class="pricing-name">Enterprise Engine</div>
-                    <div class="pricing-desc">Multi-location powerhouse</div>
-                    
-                    <div class="pricing-price">
-                        <span class="price">Custom</span>
-                    </div>
-
-                    <ul class="pricing-features">
-                        <li>Everything in Complete</li>
-                        <li>Custom integrations</li>
-                        <li>Dynamic pricing engine</li>
-                        <li>Multi-location management</li>
-                        <li>White-label portal</li>
-                        <li>Dedicated success manager</li>
-                        <li>API access</li>
-                    </ul>
-
-                    <a href="#contact" class="pricing-cta">Contact Sales →</a>
+                    <a href="#contact" class="btn btn-primary" style="width: 100%;">Partner with Us</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="cta-section">
-        <div class="cta-content">
-            <h2>Stop Losing Leads Today</h2>
-            <p>Get your free lead loss audit. We'll show you exactly where your 
-            revenue is leaking - no obligations, no pitch.</p>
-            
-            <div class="hero-cta-group">
-                <a href="#" class="btn-primary" style="background: white; color: var(--primary); border-color: white;">
-                    Get Free Audit →
-                </a>
-                <a href="#" class="btn-secondary" style="border-color: white; color: white;">
-                    (XXX) XXX-XXXX
-                </a>
-            </div>
+    <section class="final-cta">
+        <div class="container">
+            <h2>Ready to stop guessing?</h2>
+            <a href="#contact" class="btn btn-primary" style="padding: 1.5rem 4rem; font-size: 1.1rem;">Schedule Your Growth Audit</a>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 LeadCapture Pro. All rights reserved.</p>
+        <div class="container">
+            <p>&copy; 2026 Lead Matrix Revenue Systems. All Rights Reserved.</p>
+            <div class="footer-links">
+                <a href="#" style="color: var(--text-muted); margin-left: 2rem; text-decoration: none;">Privacy</a>
+                <a href="#" style="color: var(--text-muted); margin-left: 2rem; text-decoration: none;">Terms</a>
+            </div>
+        </div>
     </footer>
 
     <script>
-        // Smooth scroll for anchor links
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
-        });
-
-        // Add scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.problem-card, .pricing-card, .feature').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease';
-            observer.observe(el);
         });
     </script>
 </body>

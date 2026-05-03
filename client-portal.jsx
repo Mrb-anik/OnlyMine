@@ -2,31 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-// REPLACE WITH YOUR ACTUAL SUPABASE URL AND ANON KEY
 const supabase = createClient(
   'YOUR_SUPABASE_URL',
   'YOUR_SUPABASE_ANON_KEY'
 );
 
-export default function ClientPortal() {
+export default function LeadMatrixPortal() {
   const [leads, setLeads] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [stats, setStats] = useState({
-    totalLeads: 0,
+    totalRevenue: 0,
+    pipelineValue: 0,
     avgResponseTime: 0,
-    bookedAppointments: 0,
     conversionRate: 0
   });
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('today');
 
-  // Fetch data on component mount
   useEffect(() => {
     fetchDashboardData();
     
-    // Set up real-time subscription for new leads
     const leadsSubscription = supabase
-      .channel('leads_channel')
+      .channel('revenue_channel')
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'leads' },
         (payload) => {
@@ -43,10 +40,8 @@ export default function ClientPortal() {
 
   const fetchDashboardData = async () => {
     setLoading(true);
-    
     const timeFilter = getTimeFilter(timeframe);
     
-    // Fetch leads
     const { data: leadsData, error: leadsError } = await supabase
       .from('leads')
       .select('*')
@@ -57,7 +52,6 @@ export default function ClientPortal() {
       setLeads(leadsData);
     }
 
-    // Fetch appointments
     const { data: appointmentsData, error: appointmentsError } = await supabase
       .from('appointments')
       .select('*')
@@ -68,15 +62,15 @@ export default function ClientPortal() {
       setAppointments(appointmentsData);
     }
 
-    // Calculate stats
     if (leadsData) {
       const bookedCount = leadsData.filter(l => l.booked).length;
       const avgResponse = leadsData.reduce((sum, l) => sum + (l.response_time || 0), 0) / leadsData.length || 0;
       
+      // Simulated revenue metrics for demonstration
       setStats({
-        totalLeads: leadsData.length,
+        totalRevenue: bookedCount * 2500, // Assuming $2.5k per booking
+        pipelineValue: leadsData.length * 1500,
         avgResponseTime: Math.round(avgResponse),
-        bookedAppointments: bookedCount,
         conversionRate: leadsData.length > 0 ? Math.round((bookedCount / leadsData.length) * 100) : 0
       });
     }
@@ -87,464 +81,165 @@ export default function ClientPortal() {
   const getTimeFilter = (timeframe) => {
     const now = new Date();
     switch(timeframe) {
-      case 'today':
-        return new Date(now.setHours(0, 0, 0, 0)).toISOString();
-      case 'week':
-        return new Date(now.setDate(now.getDate() - 7)).toISOString();
-      case 'month':
-        return new Date(now.setDate(now.getDate() - 30)).toISOString();
-      default:
-        return new Date(now.setHours(0, 0, 0, 0)).toISOString();
+      case 'today': return new Date(now.setHours(0, 0, 0, 0)).toISOString();
+      case 'week': return new Date(now.setDate(now.getDate() - 7)).toISOString();
+      case 'month': return new Date(now.setDate(now.getDate() - 30)).toISOString();
+      default: return new Date(now.setHours(0, 0, 0, 0)).toISOString();
     }
   };
 
-  const updateStats = () => {
-    fetchDashboardData();
-  };
-
-  const formatTime = (seconds) => {
-    if (seconds < 60) return `${seconds}s`;
-    return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
-  };
-
+  const updateStats = () => fetchDashboardData();
+  const formatTime = (seconds) => seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: 'numeric', 
-      minute: '2-digit' 
-    });
+    return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   };
 
   const getStatusColor = (status) => {
-    const colors = {
-      new: '#FF6B35',
-      contacted: '#FFA500',
-      booked: '#00D9FF',
-      completed: '#4CAF50',
-      lost: '#666'
-    };
-    return colors[status] || '#999';
+    const colors = { new: '#FF6B35', contacted: '#00F5FF', booked: '#4CAF50', lost: '#8F9BB3' };
+    return colors[status] || '#8F9BB3';
   };
 
   return (
     <div style={styles.container}>
-      {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <h1 style={styles.logo}>LeadCapture Pro</h1>
+          <div style={styles.logo}>LEAD<span>MATRIX</span></div>
           <div style={styles.headerRight}>
             <div style={styles.liveIndicator}>
               <span style={styles.liveDot}></span>
-              <span style={styles.liveText}>LIVE</span>
+              <span style={styles.liveText}>REVENUE ENGINE LIVE</span>
             </div>
-            <button style={styles.menuButton}>☰</button>
           </div>
         </div>
       </header>
 
-      {/* Main Dashboard */}
       <div style={styles.main}>
-        {/* Timeframe Selector */}
-        <div style={styles.timeframeSelector}>
-          <button 
-            style={{...styles.timeframeButton, ...(timeframe === 'today' ? styles.timeframeActive : {})}}
-            onClick={() => setTimeframe('today')}
-          >
-            Today
-          </button>
-          <button 
-            style={{...styles.timeframeButton, ...(timeframe === 'week' ? styles.timeframeActive : {})}}
-            onClick={() => setTimeframe('week')}
-          >
-            This Week
-          </button>
-          <button 
-            style={{...styles.timeframeButton, ...(timeframe === 'month' ? styles.timeframeActive : {})}}
-            onClick={() => setTimeframe('month')}
-          >
-            This Month
-          </button>
+        <div style={styles.topRow}>
+          <div style={styles.timeframeSelector}>
+            {['today', 'week', 'month'].map(t => (
+              <button 
+                key={t}
+                style={{...styles.timeframeButton, ...(timeframe === t ? styles.timeframeActive : {})}}
+                onClick={() => setTimeframe(t)}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+          <button style={styles.refreshButton} onClick={fetchDashboardData}>Sync Data</button>
         </div>
 
-        {/* Stats Cards */}
         <div style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Total Leads</div>
-            <div style={styles.statValue}>{stats.totalLeads}</div>
-            <div style={styles.statChange}>+{Math.round(stats.totalLeads * 0.23)} vs yesterday</div>
-          </div>
-
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Avg Response Time</div>
-            <div style={styles.statValue}>{formatTime(stats.avgResponseTime)}</div>
-            <div style={{...styles.statChange, color: '#00D9FF'}}>⚡ 67% faster</div>
-          </div>
-
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Appointments Booked</div>
-            <div style={styles.statValue}>{stats.bookedAppointments}</div>
-            <div style={styles.statChange}>+{Math.round(stats.bookedAppointments * 0.35)} vs yesterday</div>
-          </div>
-
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Conversion Rate</div>
-            <div style={styles.statValue}>{stats.conversionRate}%</div>
-            <div style={{...styles.statChange, color: '#4CAF50'}}>↑ 12% improvement</div>
-          </div>
+          <StatCard label="Realized Revenue" value={formatCurrency(stats.totalRevenue)} color="#4CAF50" sub="+12.5% vs prev." />
+          <StatCard label="Pipeline Value" value={formatCurrency(stats.pipelineValue)} color="#FF6B35" sub="Open Opportunities" />
+          <StatCard label="Avg Response" value={formatTime(stats.avgResponseTime)} color="#00F5FF" sub="Target: < 60s" />
+          <StatCard label="Conv. Rate" value={`${stats.conversionRate}%`} color="#FFFFFF" sub="Lead to Closed" />
         </div>
 
-        {/* Recent Leads Table */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>Recent Leads</h2>
-            <button style={styles.refreshButton} onClick={fetchDashboardData}>
-              🔄 Refresh
-            </button>
-          </div>
-
-          {loading ? (
-            <div style={styles.loading}>Loading leads...</div>
-          ) : leads.length === 0 ? (
-            <div style={styles.emptyState}>
-              <div style={styles.emptyIcon}>📭</div>
-              <p>No leads yet for this timeframe</p>
-            </div>
-          ) : (
-            <div style={styles.tableWrapper}>
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>Time</th>
-                    <th style={styles.th}>Name</th>
-                    <th style={styles.th}>Contact</th>
-                    <th style={styles.th}>Source</th>
-                    <th style={styles.th}>Response Time</th>
-                    <th style={styles.th}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead) => (
-                    <tr key={lead.id} style={styles.tr}>
-                      <td style={styles.td}>{formatDate(lead.created_at)}</td>
-                      <td style={styles.td}>
-                        <strong>{lead.lead_name || 'Anonymous'}</strong>
-                      </td>
-                      <td style={styles.td}>
-                        <div>{lead.phone}</div>
-                        <div style={styles.email}>{lead.email}</div>
-                      </td>
-                      <td style={styles.td}>
-                        <span style={styles.sourceBadge}>{lead.source}</span>
-                      </td>
-                      <td style={styles.td}>
-                        <span style={styles.responseTime}>
-                          {formatTime(lead.response_time || 0)}
-                        </span>
-                      </td>
-                      <td style={styles.td}>
-                        <span style={{
-                          ...styles.statusBadge,
-                          backgroundColor: `${getStatusColor(lead.status)}20`,
-                          color: getStatusColor(lead.status)
-                        }}>
-                          {lead.status}
-                        </span>
-                      </td>
+        <div style={styles.dashboardGrid}>
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Active Revenue Pipeline</h2>
+            {loading ? <div style={styles.loading}>Analyzing pipeline...</div> : 
+              <div style={styles.tableWrapper}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={styles.th}>Contact</th>
+                      <th style={styles.th}>Source</th>
+                      <th style={styles.th}>Response</th>
+                      <th style={styles.th}>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Upcoming Appointments */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>Upcoming Appointments</h2>
+                  </thead>
+                  <tbody>
+                    {leads.map((lead) => (
+                      <tr key={lead.id} style={styles.tr}>
+                        <td style={styles.td}>
+                          <div style={styles.leadName}>{lead.lead_name || 'Prospect'}</div>
+                          <div style={styles.leadSub}>{lead.phone}</div>
+                        </td>
+                        <td style={styles.td}><span style={styles.sourceBadge}>{lead.source}</span></td>
+                        <td style={styles.td}><span style={{color: lead.response_time < 60 ? '#4CAF50' : '#FF6B35'}}>{formatTime(lead.response_time || 0)}</span></td>
+                        <td style={styles.td}>
+                          <span style={{...styles.statusBadge, border: `1px solid ${getStatusColor(lead.status)}`, color: getStatusColor(lead.status)}}>
+                            {lead.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            }
           </div>
 
-          {appointments.length === 0 ? (
-            <div style={styles.emptyState}>
-              <div style={styles.emptyIcon}>📅</div>
-              <p>No appointments scheduled</p>
-            </div>
-          ) : (
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Conversion Schedule</h2>
             <div style={styles.appointmentsGrid}>
-              {appointments.slice(0, 6).map((apt) => (
+              {appointments.slice(0, 4).map((apt) => (
                 <div key={apt.id} style={styles.appointmentCard}>
-                  <div style={styles.appointmentTime}>
-                    {formatDate(apt.scheduled_date)}
-                  </div>
-                  <div style={styles.appointmentCustomer}>
-                    {apt.customer_name}
-                  </div>
-                  <div style={styles.appointmentService}>
-                    {apt.service_type}
-                  </div>
-                  <div style={styles.appointmentPhone}>
-                    📞 {apt.phone}
-                  </div>
-                  <div style={{
-                    ...styles.statusBadge,
-                    backgroundColor: `${getStatusColor(apt.status)}20`,
-                    color: getStatusColor(apt.status),
-                    marginTop: '0.5rem'
-                  }}>
-                    {apt.status}
-                  </div>
+                  <div style={styles.aptTime}>{formatDate(apt.scheduled_date)}</div>
+                  <div style={styles.aptName}>{apt.customer_name}</div>
+                  <div style={styles.aptService}>{apt.service_type}</div>
+                  <div style={{...styles.statusBadge, marginTop: '1rem', background: 'rgba(255,255,255,0.05)'}}>{apt.status}</div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+function StatCard({ label, value, color, sub }) {
+  return (
+    <div style={styles.statCard}>
+      <div style={styles.statLabel}>{label}</div>
+      <div style={{...styles.statValue, color}}>{value}</div>
+      <div style={styles.statSub}>{sub}</div>
+    </div>
+  );
+}
+
 const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#0A0E27',
-    color: '#FFFFFF',
-    fontFamily: "'DM Sans', -apple-system, sans-serif",
-  },
-  header: {
-    backgroundColor: 'rgba(10, 14, 39, 0.95)',
-    backdropFilter: 'blur(10px)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    padding: '1.5rem 2rem',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  },
-  headerContent: {
-    maxWidth: '1400px',
-    margin: '0 auto',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logo: {
-    fontSize: '1.5rem',
-    fontWeight: '800',
-    color: '#FF6B35',
-    margin: 0,
-  },
-  headerRight: {
-    display: 'flex',
-    gap: '1.5rem',
-    alignItems: 'center',
-  },
-  liveIndicator: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'rgba(0, 217, 255, 0.15)',
-    padding: '0.5rem 1rem',
-    borderRadius: '50px',
-    border: '1px solid rgba(0, 217, 255, 0.3)',
-  },
-  liveDot: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    backgroundColor: '#00D9FF',
-    animation: 'pulse 2s ease-in-out infinite',
-  },
-  liveText: {
-    fontSize: '0.85rem',
-    fontWeight: '600',
-    color: '#00D9FF',
-  },
-  menuButton: {
-    background: 'transparent',
-    border: 'none',
-    color: '#FFF',
-    fontSize: '1.5rem',
-    cursor: 'pointer',
-  },
-  main: {
-    maxWidth: '1400px',
-    margin: '0 auto',
-    padding: '2rem',
-  },
-  timeframeSelector: {
-    display: 'flex',
-    gap: '0.5rem',
-    marginBottom: '2rem',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    padding: '0.5rem',
-    borderRadius: '12px',
-    width: 'fit-content',
-  },
-  timeframeButton: {
-    background: 'transparent',
-    border: 'none',
-    color: 'rgba(255, 255, 255, 0.6)',
-    padding: '0.8rem 1.5rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: '600',
-    fontSize: '0.95rem',
-    transition: 'all 0.3s ease',
-  },
-  timeframeActive: {
-    backgroundColor: '#FF6B35',
-    color: '#FFF',
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '3rem',
-  },
-  statCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '16px',
-    padding: '2rem',
-    transition: 'all 0.3s ease',
-  },
-  statLabel: {
-    fontSize: '0.9rem',
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginBottom: '0.5rem',
-  },
-  statValue: {
-    fontSize: '2.5rem',
-    fontWeight: '800',
-    color: '#FF6B35',
-    marginBottom: '0.5rem',
-  },
-  statChange: {
-    fontSize: '0.85rem',
-    color: '#FFA500',
-  },
-  section: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '16px',
-    padding: '2rem',
-    marginBottom: '2rem',
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '1.5rem',
-  },
-  sectionTitle: {
-    fontSize: '1.5rem',
-    fontWeight: '700',
-    margin: 0,
-  },
-  refreshButton: {
-    background: 'rgba(255, 107, 53, 0.15)',
-    border: '1px solid #FF6B35',
-    color: '#FF6B35',
-    padding: '0.6rem 1.2rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: '600',
-    fontSize: '0.9rem',
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '3rem',
-    color: 'rgba(255, 255, 255, 0.5)',
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '3rem',
-    color: 'rgba(255, 255, 255, 0.5)',
-  },
-  emptyIcon: {
-    fontSize: '3rem',
-    marginBottom: '1rem',
-  },
-  tableWrapper: {
-    overflowX: 'auto',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-  },
-  th: {
-    textAlign: 'left',
-    padding: '1rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: '0.85rem',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-  },
-  tr: {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-    transition: 'background 0.2s ease',
-  },
-  td: {
-    padding: '1rem',
-    fontSize: '0.95rem',
-  },
-  email: {
-    fontSize: '0.85rem',
-    color: 'rgba(255, 255, 255, 0.5)',
-  },
-  sourceBadge: {
-    backgroundColor: 'rgba(0, 217, 255, 0.15)',
-    color: '#00D9FF',
-    padding: '0.4rem 0.8rem',
-    borderRadius: '6px',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-  },
-  responseTime: {
-    color: '#4CAF50',
-    fontWeight: '600',
-  },
-  statusBadge: {
-    padding: '0.4rem 0.8rem',
-    borderRadius: '6px',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    textTransform: 'capitalize',
-    display: 'inline-block',
-  },
-  appointmentsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '1.5rem',
-  },
-  appointmentCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '12px',
-    padding: '1.5rem',
-    transition: 'all 0.3s ease',
-  },
-  appointmentTime: {
-    fontSize: '0.85rem',
-    color: '#FF6B35',
-    fontWeight: '600',
-    marginBottom: '0.5rem',
-  },
-  appointmentCustomer: {
-    fontSize: '1.1rem',
-    fontWeight: '700',
-    marginBottom: '0.3rem',
-  },
-  appointmentService: {
-    fontSize: '0.9rem',
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: '0.5rem',
-  },
-  appointmentPhone: {
-    fontSize: '0.85rem',
-    color: 'rgba(255, 255, 255, 0.6)',
-  },
+  container: { minHeight: '100vh', backgroundColor: '#05070A', color: '#FFFFFF', fontFamily: "'Inter', sans-serif" },
+  header: { borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '1.5rem 2rem', background: '#0A0E14' },
+  headerContent: { maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  logo: { fontFamily: "'Syne', sans-serif", fontSize: '1.5rem', fontWeight: '800' },
+  headerRight: { display: 'flex', alignItems: 'center', gap: '1rem' },
+  liveIndicator: { display: 'flex', alignItems: 'center', gap: '0.8rem', background: 'rgba(76, 175, 80, 0.1)', padding: '0.6rem 1.2rem', borderRadius: '4px', border: '1px solid rgba(76, 175, 80, 0.2)' },
+  liveDot: { width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4CAF50' },
+  liveText: { fontSize: '0.75rem', fontWeight: '700', color: '#4CAF50', letterSpacing: '0.05em' },
+  main: { maxWidth: '1400px', margin: '0 auto', padding: '2rem' },
+  topRow: { display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' },
+  timeframeSelector: { display: 'flex', gap: '0.5rem', background: '#121720', padding: '0.4rem', borderRadius: '4px' },
+  timeframeButton: { background: 'transparent', border: 'none', color: '#8F9BB3', padding: '0.6rem 1.2rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' },
+  timeframeActive: { backgroundColor: '#FF6B35', color: '#FFF' },
+  refreshButton: { background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', padding: '0.6rem 1.2rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' },
+  statCard: { background: '#0A0E14', border: '1px solid rgba(255,255,255,0.08)', padding: '2rem', borderRadius: '8px' },
+  statLabel: { fontSize: '0.8rem', color: '#8F9BB3', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' },
+  statValue: { fontSize: '2.2rem', fontWeight: '800', fontFamily: "'Syne', sans-serif", marginBottom: '0.5rem' },
+  statSub: { fontSize: '0.75rem', color: '#8F9BB3' },
+  dashboardGrid: { display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '2rem' },
+  section: { background: '#0A0E14', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '2rem' },
+  sectionTitle: { fontSize: '1.2rem', fontWeight: '700', marginBottom: '2rem', fontFamily: "'Syne', sans-serif", textTransform: 'uppercase' },
+  tableWrapper: { overflowX: 'auto' },
+  table: { width: '100%', borderCollapse: 'collapse' },
+  th: { textAlign: 'left', padding: '1rem', color: '#8F9BB3', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.05)' },
+  tr: { borderBottom: '1px solid rgba(255,255,255,0.03)' },
+  td: { padding: '1.2rem 1rem' },
+  leadName: { fontWeight: '700', fontSize: '0.95rem' },
+  leadSub: { fontSize: '0.8rem', color: '#8F9BB3' },
+  sourceBadge: { background: 'rgba(0,245,255,0.05)', color: '#00F5FF', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' },
+  statusBadge: { padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase' },
+  appointmentsGrid: { display: 'flex', flexDirection: 'column', gap: '1rem' },
+  appointmentCard: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '8px' },
+  aptTime: { fontSize: '0.8rem', color: '#FF6B35', fontWeight: '700', marginBottom: '0.5rem' },
+  aptName: { fontSize: '1.1rem', fontWeight: '700' },
+  aptService: { fontSize: '0.85rem', color: '#8F9BB3' },
+  loading: { padding: '4rem', textAlign: 'center', color: '#8F9BB3' }
 };
