@@ -78,7 +78,10 @@ export default function MasterAgencyAdmin() {
     <div style={styles.container}>
       {/* Sidebar */}
       <aside style={styles.sidebar}>
-        <div style={styles.logo}>LEAD<span>MATRIX</span></div>
+        <div style={styles.logo}>
+          <img src="./public/logo.png" alt="Lead Matrix" style={{height:'38px',width:'auto',display:'block',marginBottom:'3rem'}} onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='block'}} />
+          <span style={{display:'none',fontFamily:"'Syne',sans-serif",fontSize:'1.4rem',fontWeight:'800',marginBottom:'3rem'}}>LEAD<span style={{color:'#3DAB3D'}}>MATRIX</span></span>
+        </div>
         <div style={styles.sidebarLabel}>AGENCY COMMAND</div>
         <nav style={styles.sideNav}>
           <button 
@@ -129,8 +132,8 @@ function GlobalDashboard({ stats, clients }) {
     <div style={styles.dashGrid}>
       <div style={styles.statsRow}>
         <StatCard label="Managed Revenue" value={formatCurrency(stats.managedRevenue)} color="#4CAF50" />
-        <StatCard label="Total Pipeline" value={formatCurrency(stats.totalPipeline)} color="#FF6B35" />
-        <StatCard label="Portfolio Avg ROAS" value="4.8x" color="#00F5FF" />
+        <StatCard label="Total Pipeline" value={formatCurrency(stats.totalPipeline)} color="#56C240" />
+        <StatCard label="Portfolio Avg ROAS" value="4.8x" color="#7ED348" />
         <StatCard label="Active Clients" value={stats.activePipelines} color="#FFF" />
       </div>
 
@@ -170,9 +173,9 @@ function ClientSuite({ data, loading }) {
     <div style={styles.dashGrid}>
       {/* Dashboard 1: Revenue Command Center */}
       <div style={styles.statsRow}>
-        <StatCard label="Realized Revenue" value={formatCurrency(data.stats.revenue)} color="#4CAF50" />
-        <StatCard label="Pipeline Value" value={formatCurrency(data.stats.pipeline)} color="#FF6B35" />
-        <StatCard label="Conversion" value={`${data.stats.convRate}%`} color="#00F5FF" />
+        <StatCard label="Realized Revenue" value={formatCurrency(data.stats.revenue)} color="#56C240" />
+        <StatCard label="Pipeline Value" value={formatCurrency(data.stats.pipeline)} color="#3DAB3D" />
+        <StatCard label="Conversion" value={`${data.stats.convRate}%`} color="#7ED348" />
         <StatCard label="Response Velocity" value={`${data.stats.avgResponse}s`} color="#FFF" />
       </div>
 
@@ -250,34 +253,34 @@ function MetricItem({ label, value }) {
 const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
 const styles = {
-  container: { display: 'flex', minHeight: '100vh', backgroundColor: '#05070A', color: '#FFF', fontFamily: "'Inter', sans-serif" },
-  sidebar: { width: '300px', backgroundColor: '#0A0E14', borderRight: '1px solid rgba(255,255,255,0.08)', padding: '2rem' },
+  container: { display: 'flex', minHeight: '100vh', backgroundColor: '#040B04', color: '#FFF', fontFamily: "'Inter', sans-serif" },
+  sidebar: { width: '300px', backgroundColor: '#060D06', borderRight: '1px solid rgba(61,171,61,0.12)', padding: '2rem' },
   logo: { fontFamily: "'Syne', sans-serif", fontSize: '1.5rem', fontWeight: '800', marginBottom: '3rem' },
-  sidebarLabel: { fontSize: '0.7rem', color: '#8F9BB3', fontWeight: '700', letterSpacing: '0.1em', marginBottom: '1rem' },
+  sidebarLabel: { fontSize: '0.7rem', color: '#8FA88F', fontWeight: '700', letterSpacing: '0.1em', marginBottom: '1rem' },
   sideNav: { display: 'flex', flexDirection: 'column', gap: '0.5rem' },
-  navItem: { background: 'transparent', border: 'none', color: '#8F9BB3', textAlign: 'left', padding: '0.8rem 1rem', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.9rem' },
-  navItemActive: { backgroundColor: 'rgba(255,107,53,0.1)', color: '#FF6B35', fontWeight: '700' },
-  sidebarDivider: { height: '1px', background: 'rgba(255,255,255,0.05)', margin: '1.5rem 0' },
-  main: { flex: 1, padding: '3rem', overflowY: 'auto' },
+  navItem: { background: 'transparent', border: 'none', color: '#8FA88F', textAlign: 'left', padding: '0.8rem 1rem', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.9rem' },
+  navItemActive: { backgroundColor: 'rgba(61,171,61,0.1)', color: '#3DAB3D', fontWeight: '700' },
+  sidebarDivider: { height: '1px', background: 'rgba(61,171,61,0.08)', margin: '1.5rem 0' },
+  main: { flex: 1, padding: '3rem', overflowY: 'auto', background: '#05080A' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' },
   title: { fontFamily: "'Syne', sans-serif", fontSize: '2rem' },
   statusIndicator: { display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#4CAF50', fontSize: '0.8rem', fontWeight: '700' },
   pulse: { width: '8px', height: '8px', background: '#4CAF50', borderRadius: '50%', animation: 'pulse 2s infinite' },
   dashGrid: { display: 'flex', flexDirection: 'column', gap: '2rem' },
   statsRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' },
-  statCard: { background: '#0A0E14', border: '1px solid rgba(255,255,255,0.08)', padding: '1.5rem', borderRadius: '8px' },
+  statCard: { background: '#080F08', border: '1px solid rgba(61,171,61,0.12)', padding: '1.5rem', borderRadius: '8px' },
   statLabel: { fontSize: '0.75rem', color: '#8F9BB3', textTransform: 'uppercase', marginBottom: '0.5rem' },
   statValue: { fontSize: '1.8rem', fontWeight: '800', fontFamily: "'Syne', sans-serif" },
-  section: { background: '#0A0E14', border: '1px solid rgba(255,255,255,0.08)', padding: '2rem', borderRadius: '8px' },
+  section: { background: '#080F08', border: '1px solid rgba(61,171,61,0.12)', padding: '2rem', borderRadius: '8px' },
   sectionTitle: { fontSize: '1.1rem', fontWeight: '700', marginBottom: '1.5rem', textTransform: 'uppercase', fontFamily: "'Syne', sans-serif" },
   table: { width: '100%', borderCollapse: 'collapse' },
   th: { textAlign: 'left', padding: '1rem', color: '#8F9BB3', fontSize: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.05)' },
-  td: { padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.02)', fontSize: '0.9rem' },
+  td: { padding: '1rem', borderBottom: '1px solid rgba(61,171,61,0.05)', fontSize: '0.9rem' },
   tr: { transition: 'background 0.2s' },
-  healthOk: { color: '#4CAF50', fontSize: '0.7rem', fontWeight: '800', background: 'rgba(76,175,80,0.1)', padding: '0.3rem 0.6rem', borderRadius: '4px' },
+  healthOk: { color: '#56C240', fontSize: '0.7rem', fontWeight: '800', background: 'rgba(86,194,64,0.1)', padding: '0.3rem 0.6rem', borderRadius: '4px' },
   dashboardSplit: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' },
   metricList: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   metricItem: { display: 'flex', justifyContent: 'space-between', padding: '0.8rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.9rem' },
   alertItem: { background: 'rgba(255,77,77,0.05)', borderLeft: '3px solid #FF4D4D', padding: '1rem', marginBottom: '1rem', fontSize: '0.85rem', color: '#FFB8B8' },
-  loading: { padding: '5rem', textAlign: 'center', color: '#8F9BB3' }
+  loading: { padding: '5rem', textAlign: 'center', color: '#8FA88F' }
 };

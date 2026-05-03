@@ -106,7 +106,10 @@ export default function LeadMatrixPortal() {
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <div style={styles.logo}>LEAD<span>MATRIX</span></div>
+          <div style={styles.logo}>
+            <img src="./public/logo.png" alt="Lead Matrix" style={{height:'36px',width:'auto',display:'block'}} onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='block'}} />
+            <span style={{display:'none',fontFamily:"'Syne',sans-serif",fontSize:'1.4rem',fontWeight:'800'}}>LEAD<span style={{color:'#3DAB3D'}}>MATRIX</span></span>
+          </div>
           <div style={styles.headerRight}>
             <div style={styles.liveIndicator}>
               <span style={styles.liveDot}></span>
@@ -133,10 +136,10 @@ export default function LeadMatrixPortal() {
         </div>
 
         <div style={styles.statsGrid}>
-          <StatCard label="Realized Revenue" value={formatCurrency(stats.totalRevenue)} color="#4CAF50" sub="+12.5% vs prev." />
-          <StatCard label="Pipeline Value" value={formatCurrency(stats.pipelineValue)} color="#FF6B35" sub="Open Opportunities" />
-          <StatCard label="Avg Response" value={formatTime(stats.avgResponseTime)} color="#00F5FF" sub="Target: < 60s" />
-          <StatCard label="Conv. Rate" value={`${stats.conversionRate}%`} color="#FFFFFF" sub="Lead to Closed" />
+          <StatCard label="Realized Revenue" value={formatCurrency(stats.totalRevenue)} color="#56C240" sub="+12.5% vs prev." />
+          <StatCard label="Pipeline Value" value={formatCurrency(stats.pipelineValue)} color="#3DAB3D" sub="Open Opportunities" />
+          <StatCard label="Avg Response" value={formatTime(stats.avgResponseTime)} color="#7ED348" sub="Target: < 60s" />
+          <StatCard label="Conv. Rate" value={`${stats.conversionRate}%`} color="#7ED348" sub="Lead to Closed" />
         </div>
 
         <div style={styles.dashboardGrid}>
@@ -205,27 +208,27 @@ function StatCard({ label, value, color, sub }) {
 }
 
 const styles = {
-  container: { minHeight: '100vh', backgroundColor: '#05070A', color: '#FFFFFF', fontFamily: "'Inter', sans-serif" },
-  header: { borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '1.5rem 2rem', background: '#0A0E14' },
+  container: { minHeight: '100vh', backgroundColor: '#040B04', color: '#FFFFFF', fontFamily: "'Inter', sans-serif" },
+  header: { borderBottom: '1px solid rgba(61,171,61,0.12)', padding: '1.5rem 2rem', background: '#060D06' },
   headerContent: { maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   logo: { fontFamily: "'Syne', sans-serif", fontSize: '1.5rem', fontWeight: '800' },
   headerRight: { display: 'flex', alignItems: 'center', gap: '1rem' },
-  liveIndicator: { display: 'flex', alignItems: 'center', gap: '0.8rem', background: 'rgba(76, 175, 80, 0.1)', padding: '0.6rem 1.2rem', borderRadius: '4px', border: '1px solid rgba(76, 175, 80, 0.2)' },
-  liveDot: { width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4CAF50' },
-  liveText: { fontSize: '0.75rem', fontWeight: '700', color: '#4CAF50', letterSpacing: '0.05em' },
+  liveIndicator: { display: 'flex', alignItems: 'center', gap: '0.8rem', background: 'rgba(61,171,61,0.1)', padding: '0.6rem 1.2rem', borderRadius: '4px', border: '1px solid rgba(61,171,61,0.25)' },
+  liveDot: { width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#56C240' },
+  liveText: { fontSize: '0.75rem', fontWeight: '700', color: '#56C240', letterSpacing: '0.05em' },
   main: { maxWidth: '1400px', margin: '0 auto', padding: '2rem' },
   topRow: { display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' },
   timeframeSelector: { display: 'flex', gap: '0.5rem', background: '#121720', padding: '0.4rem', borderRadius: '4px' },
   timeframeButton: { background: 'transparent', border: 'none', color: '#8F9BB3', padding: '0.6rem 1.2rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' },
-  timeframeActive: { backgroundColor: '#FF6B35', color: '#FFF' },
-  refreshButton: { background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', padding: '0.6rem 1.2rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' },
+  timeframeActive: { backgroundColor: '#3DAB3D', color: '#FFF' },
+  refreshButton: { background: 'transparent', border: '1px solid rgba(61,171,61,0.2)', color: '#FFF', padding: '0.6rem 1.2rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' },
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' },
-  statCard: { background: '#0A0E14', border: '1px solid rgba(255,255,255,0.08)', padding: '2rem', borderRadius: '8px' },
+  statCard: { background: '#080F08', border: '1px solid rgba(61,171,61,0.12)', padding: '2rem', borderRadius: '8px' },
   statLabel: { fontSize: '0.8rem', color: '#8F9BB3', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' },
   statValue: { fontSize: '2.2rem', fontWeight: '800', fontFamily: "'Syne', sans-serif", marginBottom: '0.5rem' },
   statSub: { fontSize: '0.75rem', color: '#8F9BB3' },
   dashboardGrid: { display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '2rem' },
-  section: { background: '#0A0E14', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '2rem' },
+  section: { background: '#080F08', border: '1px solid rgba(61,171,61,0.12)', borderRadius: '8px', padding: '2rem' },
   sectionTitle: { fontSize: '1.2rem', fontWeight: '700', marginBottom: '2rem', fontFamily: "'Syne', sans-serif", textTransform: 'uppercase' },
   tableWrapper: { overflowX: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse' },
@@ -234,12 +237,12 @@ const styles = {
   td: { padding: '1.2rem 1rem' },
   leadName: { fontWeight: '700', fontSize: '0.95rem' },
   leadSub: { fontSize: '0.8rem', color: '#8F9BB3' },
-  sourceBadge: { background: 'rgba(0,245,255,0.05)', color: '#00F5FF', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' },
+  sourceBadge: { background: 'rgba(61,171,61,0.08)', color: '#7ED348', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' },
   statusBadge: { padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase' },
   appointmentsGrid: { display: 'flex', flexDirection: 'column', gap: '1rem' },
-  appointmentCard: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '8px' },
-  aptTime: { fontSize: '0.8rem', color: '#FF6B35', fontWeight: '700', marginBottom: '0.5rem' },
+  appointmentCard: { background: 'rgba(61,171,61,0.03)', border: '1px solid rgba(61,171,61,0.08)', padding: '1.5rem', borderRadius: '8px' },
+  aptTime: { fontSize: '0.8rem', color: '#3DAB3D', fontWeight: '700', marginBottom: '0.5rem' },
   aptName: { fontSize: '1.1rem', fontWeight: '700' },
   aptService: { fontSize: '0.85rem', color: '#8F9BB3' },
-  loading: { padding: '4rem', textAlign: 'center', color: '#8F9BB3' }
+  loading: { padding: '4rem', textAlign: 'center', color: '#8FA88F' }
 };
