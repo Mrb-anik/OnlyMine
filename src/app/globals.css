@@ -8,8 +8,8 @@
    ====================================== */
 
 :root {
-  --primary: #FF6B35;
-  --primary-dark: #E64D1F;
+  --primary: #3DAB3D;
+  --primary-dark: #1A6B1A;
   --secondary: #FFA500;
   --cyan: #00D9FF;
   --dark: #0A0E27;
@@ -46,7 +46,7 @@
   .btn-primary:hover {
     background: var(--primary-dark);
     transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(255, 107, 53, 0.45);
+    box-shadow: 0 12px 32px rgba(61, 171, 61, 0.45);
   }
 
   .btn-secondary {
@@ -63,7 +63,7 @@
   /* Section badge pill */
   .section-badge {
     @apply inline-block text-sm font-bold tracking-wider rounded-full px-4 py-1.5;
-    background: rgba(255, 107, 53, 0.12);
+    background: rgba(61, 171, 61, 0.12);
     border: 1px solid var(--primary);
     color: var(--primary);
   }
@@ -101,14 +101,14 @@
   }
   .form-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+    box-shadow: 0 0 0 3px rgba(61, 171, 61, 0.15);
   }
   .form-input::placeholder {
     color: rgba(255, 255, 255, 0.35);
   }
 
   /* Status badge */
-  .status-new      { @apply bg-[#FF6B35]/20 text-[#FF6B35]; }
+  .status-new      { @apply bg-[#3DAB3D]/20 text-[#3DAB3D]; }
   .status-contacted{ @apply bg-[#FFA500]/20 text-[#FFA500]; }
   .status-booked   { @apply bg-[#00D9FF]/20 text-[#00D9FF]; }
   .status-completed{ @apply bg-green-500/20 text-green-400; }
@@ -123,8 +123,8 @@
     background-clip: text;
   }
 
-  .glow-orange {
-    box-shadow: 0 0 40px rgba(255, 107, 53, 0.25);
+  .glow-green {
+    box-shadow: 0 0 40px rgba(61, 171, 61, 0.25);
   }
 
   .glow-cyan {
@@ -144,7 +144,7 @@
 
   /* Radial blob */
   .radial-blob {
-    background: radial-gradient(circle, rgba(255,107,53,0.18) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(61,171,61,0.18) 0%, transparent 65%);
     filter: blur(1px);
   }
 

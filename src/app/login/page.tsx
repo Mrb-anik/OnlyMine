@@ -43,12 +43,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-10">
-          <div className="w-10 h-10 rounded-xl bg-[#FF6B35] flex items-center justify-center">
-            <Zap className="w-6 h-6 text-white fill-white" />
-          </div>
-          <span className="text-2xl font-extrabold" style={{ fontFamily: 'Syne, sans-serif' }}>
-            Lead<span className="text-[#FF6B35]">Matrix</span>
-          </span>
+          <img src="/logo.png" alt="Lead Matrix" className="h-12 w-auto object-contain" />
         </Link>
 
         {/* Card */}
@@ -127,7 +122,7 @@ export default function LoginPage() {
 
           <p className="text-center text-white/40 text-xs mt-6">
             Don&apos;t have access?{' '}
-            <a href="mailto:hello@leadmatrixllc.us" className="text-[#FF6B35] hover:underline">
+            <a href="mailto:hello@leadmatrixllc.us" className="text-[#3DAB3D] hover:underline">
               Contact Lead Matrix
             </a>
           </p>

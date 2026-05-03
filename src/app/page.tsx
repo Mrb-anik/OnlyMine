@@ -30,12 +30,7 @@ function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-20">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#FF6B35] flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white fill-white" />
-          </div>
-          <span className="text-xl font-extrabold" style={{ fontFamily: 'Syne, sans-serif' }}>
-            Lead<span className="text-[#FF6B35]">Matrix</span>
-          </span>
+          <img src="/logo.png" alt="Lead Matrix" className="h-10 w-auto object-contain" />
         </Link>
 
         {/* Desktop links */}
@@ -113,7 +108,7 @@ function Hero() {
         <div className="max-w-4xl">
           {/* Trust badge */}
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-8 text-sm font-semibold animate-[fadeInUp_0.6s_ease_both]"
-            style={{ background: 'rgba(255,107,53,0.12)', border: '1px solid #FF6B35', color: '#FF6B35' }}>
+            style={{ background: 'rgba(61,171,61,0.12)', border: '1px solid #3DAB3D', color: '#3DAB3D' }}>
             <div className="live-dot" />
             Trusted by 200+ Home Service Businesses
           </div>
@@ -215,13 +210,13 @@ function Problem() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {problems.map(({ icon, title, desc, stat }) => (
             <div key={title}
-              className="glass-card p-8 group hover:border-[#FF6B35]/50 hover:-translate-y-2 transition-all duration-300 hover:glow-orange">
+              className="glass-card p-8 group hover:border-[#3DAB3D]/50 hover:-translate-y-2 transition-all duration-300 hover:glow-green">
               <div className="flex items-start gap-4 mb-5">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-[#FF6B35]"
-                  style={{ background: 'rgba(255,107,53,0.12)', border: '1px solid rgba(255,107,53,0.25)' }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-[#3DAB3D]"
+                  style={{ background: 'rgba(61,171,61,0.12)', border: '1px solid rgba(61,171,61,0.25)' }}>
                   {icon}
                 </div>
-                <div className="text-sm font-bold text-[#FF6B35] mt-3">{stat}</div>
+                <div className="text-sm font-bold text-[#3DAB3D] mt-3">{stat}</div>
               </div>
               <h3 className="text-xl font-bold mb-3">{title}</h3>
               <p className="text-white/65 leading-relaxed text-sm">{desc}</p>
@@ -298,13 +293,13 @@ function Solution() {
           <div className="relative">
             {/* Glow */}
             <div className="absolute inset-0 rounded-3xl"
-              style={{ background: 'radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 65%)' }} />
+              style={{ background: 'radial-gradient(circle, rgba(61,171,61,0.15) 0%, transparent 65%)' }} />
 
             <div className="relative glass-card p-6 rounded-2xl border border-white/10">
               {/* Dashboard Header */}
               <div className="flex justify-between items-center mb-5 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                  <BarChart2 className="w-5 h-5 text-[#FF6B35]" />
+                  <BarChart2 className="w-5 h-5 text-[#3DAB3D]" />
                   <span className="font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>Today&apos;s Performance</span>
                 </div>
                 <div className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold"
@@ -317,7 +312,7 @@ function Solution() {
               {/* Metrics grid */}
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {[
-                  { label: 'New Leads', val: '12', color: '#FF6B35' },
+                  { label: 'New Leads', val: '12', color: '#3DAB3D' },
                   { label: 'Avg Response', val: '45s', color: '#00D9FF' },
                   { label: 'Booked', val: '8', color: '#4CAF50' },
                   { label: 'Conversion', val: '67%', color: '#FFA500' },
@@ -431,8 +426,8 @@ function CaseStudies() {
                   <div className="text-xl font-bold text-white/60">{cs.before}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-[#FF6B35] text-xs mb-1 font-bold">AFTER</div>
-                  <div className="text-xl font-bold text-[#FF6B35]">{cs.after}</div>
+                  <div className="text-[#3DAB3D] text-xs mb-1 font-bold">AFTER</div>
+                  <div className="text-xl font-bold text-[#3DAB3D]">{cs.after}</div>
                 </div>
               </div>
             </div>
@@ -446,7 +441,7 @@ function CaseStudies() {
                 onClick={() => setActive(i)}
                 className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
                   i === active
-                    ? 'bg-[#FF6B35] text-white'
+                    ? 'bg-[#3DAB3D] text-white'
                     : 'text-white/50 hover:text-white border border-white/20'
                 }`}
               >
@@ -530,18 +525,18 @@ function Pricing() {
               key={plan.name}
               className={`glass-card p-8 rounded-2xl relative transition-all duration-300 group ${
                 plan.featured
-                  ? 'border-[#FF6B35]/60 scale-105 glow-orange'
-                  : 'hover:border-[#FF6B35]/40 hover:-translate-y-2'
+                  ? 'border-[#3DAB3D]/60 scale-105 glow-green'
+                  : 'hover:border-[#3DAB3D]/40 hover:-translate-y-2'
               }`}
             >
               {plan.featured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FF6B35] text-white text-xs font-black px-5 py-1.5 rounded-full uppercase tracking-wider">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#3DAB3D] text-white text-xs font-black px-5 py-1.5 rounded-full uppercase tracking-wider">
                   Most Popular
                 </div>
               )}
 
               <div className="mb-6">
-                <div className="text-sm font-bold text-[#FF6B35] uppercase tracking-wider mb-2">{plan.name}</div>
+                <div className="text-sm font-bold text-[#3DAB3D] uppercase tracking-wider mb-2">{plan.name}</div>
                 <div className="text-5xl font-extrabold mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>
                   {plan.price}
                   {plan.price !== 'Custom' && <span className="text-lg text-white/50 font-normal">/mo</span>}
@@ -552,7 +547,7 @@ function Pricing() {
               <ul className="space-y-3 mb-8">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-3 text-sm text-white/80">
-                    <CheckCircle className="w-4 h-4 text-[#FF6B35] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-[#3DAB3D] flex-shrink-0 mt-0.5" />
                     {f}
                   </li>
                 ))}
@@ -562,8 +557,8 @@ function Pricing() {
                 href="#audit"
                 className={`w-full py-3.5 rounded-xl font-bold text-center block transition-all duration-200 ${
                   plan.featured
-                    ? 'bg-[#FF6B35] text-white hover:bg-[#E64D1F]'
-                    : 'border border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white'
+                    ? 'bg-[#3DAB3D] text-white hover:bg-[#1A6B1A]'
+                    : 'border border-[#3DAB3D] text-[#3DAB3D] hover:bg-[#3DAB3D] hover:text-white'
                 }`}
               >
                 {plan.cta} →
@@ -597,7 +592,7 @@ function ROICalculator() {
   return (
     <div className="mt-20 glass-card p-10 rounded-3xl max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <TrendingUp className="w-10 h-10 text-[#FF6B35] mx-auto mb-3" />
+        <TrendingUp className="w-10 h-10 text-[#3DAB3D] mx-auto mb-3" />
         <h3 className="text-3xl font-bold mb-2">💰 ROI Calculator</h3>
         <p className="text-white/55">See your potential revenue increase in seconds</p>
       </div>
@@ -615,7 +610,7 @@ function ROICalculator() {
               <input
                 type="range" min={min} max={max} step={step} value={val}
                 onChange={(e) => set(Number(e.target.value))}
-                className="flex-1 accent-[#FF6B35]"
+                className="flex-1 accent-[#3DAB3D]"
               />
               <div className="form-input !w-28 !py-2 text-center text-sm font-bold">
                 {val.toLocaleString()}
@@ -635,9 +630,9 @@ function ROICalculator() {
         </button>
 
         {result !== null && (
-          <div className="mt-8 p-6 rounded-2xl" style={{ background: 'rgba(255,107,53,0.08)', border: '1px solid rgba(255,107,53,0.3)' }}>
+          <div className="mt-8 p-6 rounded-2xl" style={{ background: 'rgba(61,171,61,0.08)', border: '1px solid rgba(61,171,61,0.3)' }}>
             <p className="text-white/70 mb-2 text-sm">With 25% improvement in lead capture, you could add:</p>
-            <div className="text-5xl font-extrabold text-[#FF6B35] mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>
+            <div className="text-5xl font-extrabold text-[#3DAB3D] mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>
               ${result.toLocaleString()}<span className="text-2xl">/mo</span>
             </div>
             <div className="text-2xl font-bold text-white/80">
@@ -690,12 +685,12 @@ function Resources() {
         <div className="grid md:grid-cols-3 gap-6">
           {resources.map(({ emoji, type, title, desc }) => (
             <div key={title}
-              className="glass-card p-8 rounded-2xl hover:border-[#FF6B35]/40 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+              className="glass-card p-8 rounded-2xl hover:border-[#3DAB3D]/40 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
               <div className="text-5xl mb-5">{emoji}</div>
-              <div className="text-xs font-black text-[#FF6B35] tracking-widest mb-3">{type}</div>
-              <h3 className="text-xl font-bold mb-3 leading-snug group-hover:text-[#FF6B35] transition-colors">{title}</h3>
+              <div className="text-xs font-black text-[#3DAB3D] tracking-widest mb-3">{type}</div>
+              <h3 className="text-xl font-bold mb-3 leading-snug group-hover:text-[#3DAB3D] transition-colors">{title}</h3>
               <p className="text-white/60 text-sm leading-relaxed mb-6">{desc}</p>
-              <div className="flex items-center gap-2 text-[#FF6B35] font-semibold text-sm group-hover:gap-3 transition-all">
+              <div className="flex items-center gap-2 text-[#3DAB3D] font-semibold text-sm group-hover:gap-3 transition-all">
                 Download Free <ArrowRight className="w-4 h-4" />
               </div>
             </div>
@@ -727,7 +722,7 @@ function AuditCTA() {
   return (
     <section id="audit" className="py-28 relative overflow-hidden">
       <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #E64D1F 100%)' }} />
+        style={{ background: 'linear-gradient(135deg, #3DAB3D 0%, #1A6B1A 100%)' }} />
       <div className="absolute top-[-30%] left-[-10%] w-[600px] h-[600px] rounded-full"
         style={{ background: 'rgba(255,255,255,0.08)' }} />
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full"
@@ -811,18 +806,13 @@ function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#FF6B35] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white fill-white" />
-              </div>
-              <span className="text-xl font-extrabold" style={{ fontFamily: 'Syne, sans-serif' }}>
-                Lead<span className="text-[#FF6B35]">Matrix</span>
-              </span>
+              <img src="/logo.png" alt="Lead Matrix" className="h-10 w-auto object-contain" />
             </div>
             <p className="text-white/55 text-sm leading-relaxed max-w-sm">
               The complete AI-powered lead capture & automation platform for home service contractors. Respond faster. Book more. Grow.
             </p>
             <div className="mt-4 text-sm text-white/45">
-              <a href="mailto:hello@leadmatrixllc.us" className="hover:text-[#FF6B35] transition-colors">
+              <a href="mailto:hello@leadmatrixllc.us" className="hover:text-[#3DAB3D] transition-colors">
                 hello@leadmatrixllc.us
               </a>
             </div>

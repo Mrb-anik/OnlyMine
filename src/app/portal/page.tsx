@@ -66,12 +66,7 @@ function Sidebar({ active, setActive, onLogout, mobileOpen, setMobileOpen, isAdm
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#FF6B35] flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white fill-white" />
-          </div>
-          <span className="text-lg font-extrabold" style={{ fontFamily: 'Syne, sans-serif' }}>
-            Lead<span className="text-[#FF6B35]">Matrix</span>
-          </span>
+          <img src="/logo.png" alt="Lead Matrix" className="h-9 w-auto object-contain" />
         </Link>
       </div>
 
@@ -83,7 +78,7 @@ function Sidebar({ active, setActive, onLogout, mobileOpen, setMobileOpen, isAdm
             onClick={() => { setActive(id); setMobileOpen(false) }}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold w-full text-left transition-all duration-200 ${
               active === id
-                ? 'bg-[#FF6B35] text-white'
+                ? 'bg-[#3DAB3D] text-white'
                 : 'text-white/60 hover:text-white hover:bg-white/08'
             }`}
           >
@@ -129,7 +124,7 @@ function Sidebar({ active, setActive, onLogout, mobileOpen, setMobileOpen, isAdm
 }
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
-function StatCard({ label, value, sub, color = '#FF6B35', icon }: {
+function StatCard({ label, value, sub, color = '#3DAB3D', icon }: {
   label: string; value: string; sub?: string; color?: string; icon: React.ReactNode
 }) {
   return (
@@ -262,8 +257,8 @@ function LeadsTab({ leads, onRefresh }: { leads: Lead[], onRefresh: () => void }
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
            {/* Upload Form */}
            <form onSubmit={handleUpload} className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
-             <input type="file" accept=".csv" className="text-xs w-48 text-white/60 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#FF6B35] file:text-white hover:file:bg-[#e05b2c] cursor-pointer" onChange={e => setUploadFile(e.target.files?.[0] || null)} required />
-             <button type="submit" disabled={uploading || !uploadFile} className="bg-[#FF6B35] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#e05b2c] transition-colors flex items-center gap-1 disabled:opacity-50">
+             <input type="file" accept=".csv" className="text-xs w-48 text-white/60 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#3DAB3D] file:text-white hover:file:bg-[#1A6B1A] cursor-pointer" onChange={e => setUploadFile(e.target.files?.[0] || null)} required />
+             <button type="submit" disabled={uploading || !uploadFile} className="bg-[#3DAB3D] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#1A6B1A] transition-colors flex items-center gap-1 disabled:opacity-50">
                <UploadCloud className="w-3.5 h-3.5" />
                {uploading ? '...' : 'Import'}
              </button>
@@ -275,7 +270,7 @@ function LeadsTab({ leads, onRefresh }: { leads: Lead[], onRefresh: () => void }
                  key={s}
                  onClick={() => setFilter(s)}
                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                   filter === s ? 'bg-[#FF6B35] text-white' : 'text-white/50 border border-white/15 hover:text-white'
+                   filter === s ? 'bg-[#3DAB3D] text-white' : 'text-white/50 border border-white/15 hover:text-white'
                  }`}
                >
                  {s}
@@ -345,7 +340,7 @@ function AppointmentsTab({ appointments }: { appointments: Appointment[] }) {
   const AppCard = ({ apt }: { apt: Appointment }) => (
     <div className="glass-card p-5 rounded-xl hover:-translate-y-1 transition-all duration-200">
       <div className="flex items-start justify-between mb-3">
-        <div className="text-sm font-bold text-[#FF6B35]">
+        <div className="text-sm font-bold text-[#3DAB3D]">
           {new Date(apt.scheduled_date).toLocaleString('en-US', {
             weekday: 'short', month: 'short', day: 'numeric',
             hour: 'numeric', minute: '2-digit'
@@ -517,7 +512,7 @@ export default function PortalPage() {
                   key={tf}
                   onClick={() => setTimeframe(tf)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                    timeframe === tf ? 'bg-[#FF6B35] text-white' : 'text-white/50 hover:text-white'
+                    timeframe === tf ? 'bg-[#3DAB3D] text-white' : 'text-white/50 hover:text-white'
                   }`}
                 >
                   {tf === 'today' ? 'Today' : tf === 'week' ? '7 Days' : '30 Days'}
@@ -549,7 +544,7 @@ export default function PortalPage() {
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-white/10 border-t-[#FF6B35] rounded-full animate-spin mx-auto mb-4" />
+                <div className="w-12 h-12 border-4 border-white/10 border-t-[#3DAB3D] rounded-full animate-spin mx-auto mb-4" />
                 <p className="text-white/40">Loading your dashboard...</p>
               </div>
             </div>
